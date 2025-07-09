@@ -2,14 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Forever Lockedin</title>
+  <title>Forever Lockedin - Login</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      width: 300px;
+      text-align: center;
+    }
+
+    .logo {
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .login-container h1 {
+      margin-bottom: 10px;
+    }
+
+    .login-container p {
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .login-container input[type="text"],
+    .login-container input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .login-container button:hover {
+      background-color: #005599;
+    }
+
+    .signup-link {
+      display: block;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #003366;
+      text-decoration: none;
+    }
+
+    .attribution {
+      margin-top: 20px;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .attribution a {
+      color: #666;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-<h1>Welcome to Forever Lockedin</h1>
-<p>You hold the Key to all connections.</p>
-<p>
-  <label for="Username">Username:</label>
-  <input type="text" Username="Username" id="Username">
-</p>
+  <div class="login-container">
+    <!-- Logo icon -->
+    <a href="https://www.flaticon.com/free-icons/padlock" title="padlock icons" class="logo" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Padlock Icon">
+    </a>
+
+    <h1>Welcome to Forever Lockedin</h1>
+    <p>You hold the Key to all connections.</p>
+
+    <form>
+      <input type="text" id="username" name="username" placeholder="Username" required>
+      <input type="password" id="password" name="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+
+    <a href="#" class="signup-link">Don't have an account? Sign up</a>
+
+    <!-- Attribution for the icon -->
+    <div class="attribution">
+      Icon by <a href="https://www.flaticon.com/authors/dinosoftlabs" target="_blank">DinosoftLabs</a> from <a href="https://www.flaticon.com/" target="_blank">Flaticon</a>
+    </div>
+  </div>
 </body>
 </html>
