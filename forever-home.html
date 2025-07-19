@@ -128,5 +128,26 @@
       isDragging = false;
     });
   </script>
+  const widget = document.getElementById('widget');
+
+widget.querySelectorAll('button').forEach((btn, idx) => {
+  btn.addEventListener('click', () => {
+    switch(idx) {
+      case 0: // Profile
+        window.location.href = 'user-profile.html';
+        break;
+      case 1: // Settings
+        window.location.href = 'settings.html';
+        break;
+      case 2: // Menu
+        window.location.href = 'menu.html';
+        break;
+      case 3: // Messages
+        window.location.href = 'messages.html'; // change if your messages page has another name
+        break;
+    }
+  });
+});
+
 </body>
 </html>
