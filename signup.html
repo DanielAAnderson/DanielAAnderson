@@ -65,15 +65,53 @@
 <body>
   <div class="signup-container">
     <h2>Create Your LockedIn Account</h2>
-    <form>
-      <input type="text" name="username" placeholder="Desired Username" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <input type="email" name="email" placeholder="Email Address" required>
-      <input type="date" name="dob" placeholder="Date of Birth" required>
-      <button type="submit">Sign Up</button>
-    </form>
+    <form id="signupForm">
+  <input type="text" id="signup-username" placeholder="Desired Username" required>
+  <input type="email" id="signup-email" placeholder="Email Address" required>
+  <input type="password" id="signup-password" placeholder="Password" required>
+  <input type="date" id="signup-dob" required>
+  <button type="submit">Sign Up</button>
+</form>
+
+<script>
+  document.getElementById('signupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        alert("Signup successful!");
+        window.location.href = "index.html"; // Go to login
+      })
+      .catch(error => {
+        alert("Signup error: " + error.message);
+      });
+  });
+</script>
+
 
     <a href="Index.html" class="back-link">Already have an account? Login</a>
   </div>
+  <!-- Firebase JS SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js"></script>
+
+<script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+  authDomain: "forever-lockedin.firebaseapp.com",
+  projectId: "forever-lockedin",
+  storageBucket: "forever-lockedin.firebasestorage.app",
+  messagingSenderId: "1046869755533",
+  appId: "1:1046869755533:web:a467a505735d25c0ee44c4",
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+</script>
+
 </body>
 </html>
