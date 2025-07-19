@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LockedIn | Home</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #eef2f5;
+    }
+
+    header {
+      background: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      resize: none;
+      font-size: 14px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    input[type="file"] {
+      margin-bottom: 10px;
+    }
+
+    #preview {
+      max-width: 100%;
+      max-height: 200px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .post {
+      border-top: 1px solid #ccc;
+      margin-top: 20px;
+      padding-top: 20px;
+    }
+
+    .widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      width: 80px;
+      cursor: move;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .widget button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .widget button img {
+      width: 24px;
+      height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>Welcome, <span id="user-email">Loading...</span></h2>
+  </header>
+
+  <div class="container">
+    <h3>Create a Post</h3>
+    <form id="postForm">
+      <textarea id="postText" maxlength="250" placeholder="What's on your mind? (max 250 chars)"></textarea><br>
+      <input type="file" id="imageUpload" accept="image/*" /><br>
+      <img id="preview" alt="Image Preview" />
+      <button type="submit">Post</button>
+    </form>
+
+    <div id="posts">
+      <h3>Your Posts</h3>
+    </div>
+  </div>
+
+  <!-- Floating Widget -->
+  <div class="widget" id="widget">
+    <button title="Profile"><img src="profile-icon.png" alt="P" /></button>
+    <button title="Settings"><img src="settings-icon.png" alt="S" /></button>
+    <button title="Menu"><img src="menu-icon.png" alt="M" /></button>
+    <button title="Messages"><img src="message-icon.png" alt="Msg" /></button>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+      authDomain: "forever-lockedin.firebaseapp.com",
+      projectId: "forever-lockedin",
+      storageBucket: "forever-lockedin.firebasestorage.app",
+      messagingSenderId: "1046869755533",
+      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const userEmailEl = document.getElementById('user-email');
+    const postsEl = document.getElementById('posts');
+    const postForm = document.getElementById('postForm');
+    const previewImg = document.getElementById('preview');
+    const imageUpload = document.getElementById('imageUpload');
+
+    let imageDataURL = "";
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        userEmailEl.textContent = user.email;
+      } else {
+        window.location.href = "index.html"; // Redirect if not logged in
+      }
+    });
+
+    imageUpload.addEventListener('change', () => {
+      const file = imageUpload.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          imageDataURL = e.target.result;
+          previewImg.src = imageDataURL;
+          previewImg.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    postForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const text = document.getElementById('postText').value;
+      if (!text.trim()) return alert("Post cannot be empty.");
+      const postDiv = document.createElement('div');
+      postDiv.className = "post";
+      postDiv.innerHTML = `
+        <p>${text}</p>
+        ${imageDataURL ? `<img src="${imageDataURL}" style="max-width:100%; max-height:200px;" />` : ""}
+      `;
+      postsEl.appendChild(postDiv);
+      postForm.reset();
+      previewImg.style.display = "none";
+      imageDataURL = "";
+    });
+
+    // Widget drag logic
+    const widget = document.getElementById("widget");
+    let isDragging = false, offsetX, offsetY;
+
+    widget.addEventListener("mousedown", e => {
+      isDragging = true;
+      offsetX = e.clientX - widget.offsetLeft;
+      offsetY = e.clientY - widget.offsetTop;
+    });
+
+    document.addEventListener("mousemove", e => {
+      if (isDragging) {
+        const newX = e.clientX - offsetX;
+        const newY = e.clientY - offsetY;
+        const maxX = window.innerWidth - widget.offsetWidth;
+        const maxY = window.innerHeight - widget.offsetHeight;
+        widget.style.left = Math.min(Math.max(0, newX), maxX) + "px";
+        widget.style.top = Math.min(Math.max(0, newY), maxY) + "px";
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+  </script>
+</body>
+</html>
