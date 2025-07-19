@@ -127,14 +127,14 @@
     document.addEventListener("mouseup", () => {
       isDragging = false;
     });
-  </script>
-  const widget = document.getElementById('widget');
+
+    const widget = document.getElementById('widget');
 
 widget.querySelectorAll('button').forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     switch(idx) {
       case 0: // Profile
-        window.location.href = 'user-profile.html';
+        window.location.href = 'userprofile.html';
         break;
       case 1: // Settings
         window.location.href = 'settings.html';
@@ -148,6 +148,8 @@ widget.querySelectorAll('button').forEach((btn, idx) => {
     }
   });
 });
+  </script>
+  
 
 </body>
 </html>
