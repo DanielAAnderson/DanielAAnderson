@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Settings - Forever Lockedin</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .settings-container {
+      max-width: 600px;
+      margin: 60px auto 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .setting-item {
+      margin-bottom: 20px;
+    }
+    .setting-item label {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 6px;
+      color: #f57c00; /* orange */
+    }
+    .setting-item input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button.signout-btn {
+      background-color: #f57c00;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    button.signout-btn:hover {
+      background-color: #ef6c00;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo top right -->
+  <a href="forever-home.html" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">
+    <img src="logo.png" alt="Forever Logo" style="height: 40px; cursor: pointer;" />
+  </a>
+
+  <div class="settings-container">
+    <h2>Settings</h2>
+    <div class="setting-item">
+      <label>User Name</label>
+      <input type="text" value="User123" readonly />
+    </div>
+    <div class="setting-item">
+      <label>Password</label>
+      <input type="password" value="password123" readonly />
+    </div>
+    <div class="setting-item">
+      <label>Private Account</label>
+      <button disabled>Toggle (Visual Only)</button>
+    </div>
+    <div class="setting-item">
+      <label>Notification Settings</label>
+      <button disabled>Toggle (Visual Only)</button>
+    </div>
+    <button class="signout-btn" id="signoutBtn">Sign Out</button>
+  </div>
+
+  <!-- Widget -->
+  <div class="widget" id="widget">
+    <button title="Profile"><img src="padlock.png" alt="P" /></button>
+    <button title="Settings"><img src="dial.png" alt="S" /></button>
+    <button title="Menu"><img src="door-key.png" alt="M" /></button>
+    <button title="Messages"><img src="key-hole.png" alt="Msg" /></button>
+  </div>
+
+  <script type="module">
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+      authDomain: "forever-lockedin.firebaseapp.com",
+      projectId: "forever-lockedin",
+      storageBucket: "forever-lockedin.firebasestorage.app",
+      messagingSenderId: "1046869755533",
+      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("signoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      }).catch(error => {
+        alert("Error signing out: " + error.message);
+      });
+    });
+  </script>
+
+</body>
+</html>
