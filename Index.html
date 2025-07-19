@@ -8,9 +8,7 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      /* background: url('background.jpg') no-repeat center center fixed; */
-      /* background-size: cover; */
-      background-color: #f0f0f0;
+      background: #f4f4f4; /* Background removed for now */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -26,28 +24,7 @@
       text-align: center;
     }
 
-    .logo {
-      display: block;
-      margin-bottom: 20px;
-    }
-
-    .logo img {
-      width: 50px;
-      height: 50px;
-    }
-
-    .login-container h1 {
-      margin-bottom: 10px;
-    }
-
-    .login-container p {
-      margin-bottom: 20px;
-      font-style: italic;
-    }
-
-    .login-container input[type="text"],
-    .login-container input[type="password"],
-    .login-container input[type="email"] {
+    .login-container input {
       width: 100%;
       padding: 10px;
       margin: 8px 0;
@@ -67,55 +44,29 @@
       font-size: 16px;
     }
 
-    .login-container button:hover {
-      background-color: #005599;
-    }
-
     .signup-link {
-      display: block;
       margin-top: 15px;
       font-size: 14px;
+      display: block;
+      text-decoration: none;
       color: #003366;
-      text-decoration: none;
-    }
-
-    .attribution {
-      margin-top: 20px;
-      font-size: 11px;
-      color: #666;
-    }
-
-    .attribution a {
-      color: #666;
-      text-decoration: none;
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <a href="https://www.flaticon.com/free-icons/padlock" title="padlock icons" class="logo" target="_blank">
-      <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Padlock Icon">
-    </a>
-
-    <h1>Welcome to Forever Lockedin</h1>
-    <p>You hold the Key to all connections.</p>
-
+    <h1>Login</h1>
     <form id="loginForm">
-      <input type="email" id="login-email" placeholder="Email" required>
-      <input type="password" id="login-password" placeholder="Password" required>
+      <input type="email" id="login-email" placeholder="Email" required />
+      <input type="password" id="login-password" placeholder="Password" required />
       <button type="submit">Login</button>
     </form>
-
-    <a href="signup.html" class="signup-link">Don't have an account? Sign up</a>
-
-    <div class="attribution">
-      Icon by <a href="https://www.flaticon.com/authors/dinosoftlabs" target="_blank">DinosoftLabs</a> from <a href="https://www.flaticon.com/" target="_blank">Flaticon</a>
-    </div>
+    <a class="signup-link" href="signup.html">Don't have an account? Sign up</a>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
@@ -129,17 +80,17 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
 
       signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
+        .then((userCredential) => {
           alert("Login successful!");
-          window.location.href = "home.html";
+          window.location.href = "home.html"; // Replace with your real page
         })
-        .catch(error => {
+        .catch((error) => {
           alert("Login error: " + error.message);
         });
     });
