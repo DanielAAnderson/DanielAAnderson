@@ -115,3 +115,11 @@ button:hover {
   width: 28px;
   height: 28px;
 }
+
+.widget img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  margin: 8px auto;
+}
