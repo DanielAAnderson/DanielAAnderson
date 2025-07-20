@@ -3,6 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Basic widget styling */
+    .widget {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      cursor: move;
+      z-index: 1000;
+    }
+    .widget img {
+      width: 32px;
+      height: 32px;
+    }
+    #preview {
+      display: none;
+      max-width: 100%;
+      max-height: 200px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
@@ -25,26 +51,25 @@
   </div>
 
   <!-- Floating Widget -->
- <div class="widget" id="widget">
-  <a href="userprofile.html" title="Profile">
-    <img src="padlock.png" alt="Profile" />
-  </a>
-  <a href="settings.html" title="Settings">
-    <img src="dial.png" alt="Settings" />
-  </a>
-  <a href="index.html" title="Menu">
-    <img src="door-key.png" alt="Menu" />
-  </a>
-  <a href="messages.html" title="Messages">
-    <img src="key-hole.png" alt="Messages" />
-  </a>
-</div>
-
+  <div class="widget" id="widget">
+    <a href="userprofile.html" title="Profile">
+      <img src="padlock.png" alt="Profile" />
+    </a>
+    <a href="settings.html" title="Settings">
+      <img src="dial.png" alt="Settings" />
+    </a>
+    <a href="index.html" title="Menu">
+      <img src="door-key.png" alt="Menu" />
+    </a>
+    <a href="messages.html" title="Messages">
+      <img src="key-hole.png" alt="Messages" />
+    </a>
+  </div>
 
   <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
@@ -63,6 +88,7 @@
     const postForm = document.getElementById('postForm');
     const previewImg = document.getElementById('preview');
     const imageUpload = document.getElementById('imageUpload');
+    const widget = document.getElementById("widget");
 
     let imageDataURL = "";
 
@@ -89,8 +115,8 @@
 
     postForm.addEventListener('submit', e => {
       e.preventDefault();
-      const text = document.getElementById('postText').value;
-      if (!text.trim()) return alert("Post cannot be empty.");
+      const text = document.getElementById('postText').value.trim();
+      if (!text) return alert("Post cannot be empty.");
       const postDiv = document.createElement('div');
       postDiv.className = "post";
       postDiv.innerHTML = `
@@ -103,9 +129,8 @@
       imageDataURL = "";
     });
 
-    // Widget drag logic
-    const widget = document.getElementById("widget");
-    let isDragging = false, offsetX, offsetY;
+    // Drag logic
+    let isDragging = false, offsetX = 0, offsetY = 0;
 
     widget.addEventListener("mousedown", e => {
       isDragging = true;
@@ -127,29 +152,7 @@
     document.addEventListener("mouseup", () => {
       isDragging = false;
     });
-
-    const widget = document.getElementById('widget');
-
-widget.querySelectorAll('button').forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    switch(idx) {
-      case 0: // Profile
-        window.location.href = 'userprofile.html';
-        break;
-      case 1: // Settings
-        window.location.href = 'settings.html';
-        break;
-      case 2: // Menu
-        window.location.href = 'menu.html';
-        break;
-      case 3: // Messages
-        window.location.href = 'messages.html'; // change if your messages page has another name
-        break;
-    }
-  });
-});
   </script>
-  
 
 </body>
 </html>
