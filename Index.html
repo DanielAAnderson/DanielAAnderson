@@ -129,11 +129,19 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-   document.getElementById("loginForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-  window.location.href = "forever-home.html";
-});
+    // grab your inputs
+    const loginEmail    = document.getElementById("login-email");
+    const loginPassword = document.getElementById("login-password");
+
+    document.getElementById("loginForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      try {
+        await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+        window.location.href = "forever-home.html";
+      } catch (error) {
+        alert("Login error: " + error.message);
+      }
+    });
   </script>
 </body>
 </html>
