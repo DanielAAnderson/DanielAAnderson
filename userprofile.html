@@ -45,6 +45,26 @@
     .background-picker {
       margin-top: 15px;
     }
+    .stats-section {
+      margin-top: 30px;
+    }
+    .stats-section h3 {
+      margin-bottom: 10px;
+    }
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .stats-table th,
+    .stats-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .stats-table th {
+      background-color: #f57c00;
+      color: white;
+    }
     .posts-section {
       margin-top: 30px;
     }
@@ -71,6 +91,21 @@
 
   <div class="profile-container">
     <h2>User Profile</h2>
+
+    <!-- NEW: Stats Table -->
+    <div class="stats-section">
+      <h3>Profile Stats</h3>
+      <table class="stats-table">
+        <tr>
+          <th>Friends</th>
+          <td><span id="friendCount">0</span></td>
+        </tr>
+        <tr>
+          <th>Posts</th>
+          <td><span id="postCount">0</span></td>
+        </tr>
+      </table>
+    </div>
 
     <div class="profile-header">
       <label for="profilePicInput">
@@ -114,30 +149,27 @@
     if (localStorage.getItem("profilePic")) {
       profilePic.src = localStorage.getItem("profilePic");
     }
-
     if (localStorage.getItem("bio")) {
       bioInput.value = localStorage.getItem("bio");
     }
-
-    // Load background color
     if (localStorage.getItem("bgColor")) {
       document.body.style.backgroundColor = localStorage.getItem("bgColor");
       backgroundColorInput.value = localStorage.getItem("bgColor");
     }
 
-    // Upload profile picture
+    // Profile picture upload
     profilePicInput.addEventListener("change", e => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = evt => {
         profilePic.src = evt.target.result;
         localStorage.setItem("profilePic", evt.target.result);
       };
       reader.readAsDataURL(file);
     });
 
-    // Save bio on input
+    // Save bio
     bioInput.addEventListener("input", () => {
       localStorage.setItem("bio", bioInput.value);
     });
@@ -148,12 +180,13 @@
       localStorage.setItem("bgColor", backgroundColorInput.value);
     });
 
-    // Dummy posts (replace with real ones if you want)
+    // Dummy posts
     const dummyPosts = [
       { text: "Just had a great day!", img: "" },
       { text: "Check out this photo.", img: "sample-photo.jpg" }
     ];
 
+    // Load posts
     function loadPosts() {
       if (dummyPosts.length === 0) {
         postsEl.innerHTML = "<p>No posts yet.</p>";
@@ -165,32 +198,26 @@
           </div>
         `).join("");
       }
+      // **NEW**: update stats counts
+      const friends = JSON.parse(localStorage.getItem("friends") || "[]");
+      document.getElementById("friendCount").textContent = friends.length;
+      document.getElementById("postCount").textContent = dummyPosts.length;
     }
     loadPosts();
 
+    // Widget navigation
     const widget = document.getElementById('widget');
-
-widget.querySelectorAll('button').forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    switch(idx) {
-      case 0: // Profile
-        window.location.href = 'userprofile.html';
-        break;
-      case 1: // Settings
-        window.location.href = 'settings.html';
-        break;
-      case 2: // Menu
-        window.location.href = 'menu.html';
-        break;
-      case 3: // Messages
-        window.location.href = 'messages.html'; // change if your messages page has another name
-        break;
-    }
-  });
-});
-
+    widget.querySelectorAll('button').forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        switch(idx) {
+          case 0: window.location.href = 'userprofile.html'; break;
+          case 1: window.location.href = 'settings.html'; break;
+          case 2: window.location.href = 'menu.html'; break;
+          case 3: window.location.href = 'messages.html'; break;
+        }
+      });
+    });
   </script>
-
 
 </body>
 </html>
