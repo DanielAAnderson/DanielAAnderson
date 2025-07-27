@@ -99,7 +99,7 @@
 
     document.getElementById("signoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => {
-        window.location.href = "index.html";
+        window.location.href = "/index.html";
       }).catch(error => {
         alert("Error signing out: " + error.message);
       });
