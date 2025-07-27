@@ -100,6 +100,26 @@
       text-align: center;
       padding: 40px 0;
     }
+
+    /* --- Widget Styles --- */
+    .widget {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: move;
+      z-index: 1000;
+    }
+    .widget img {
+      width: 32px;
+      height: 32px;
+    }
   </style>
 </head>
 <body>
@@ -108,87 +128,4 @@
 
   <div class="inbox" id="inbox">
     <p id="noMessages">No messages yet.</p>
-  </div>
-
-  <div class="message-form">
-    <h3>Send a Message</h3>
-    <form id="messageForm">
-      <label for="recipient">To:</label>
-      <select id="recipient" required>
-        <option value="" disabled selected>No users available</option>
-      </select>
-      <label for="messageText">Message:</label>
-      <textarea id="messageText" placeholder="Type your message here..." required></textarea>
-      <button type="submit">Send</button>
-    </form>
-  </div>
-
-  <script>
-    const inbox = document.getElementById("inbox");
-    const form = document.getElementById("messageForm");
-    const messageText = document.getElementById("messageText");
-    const noMessages = document.getElementById("noMessages");
-
-    let messages = []; // For now, just in-memory
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      
-      const text = messageText.value.trim();
-      const recipient = document.getElementById("recipient").value;
-
-      if (!text || !recipient) return;
-
-      const message = {
-        to: recipient,
-        text,
-        date: new Date().toLocaleString()
-      };
-
-      messages.push(message);
-      displayMessages();
-      form.reset();
-    });
-
-    function displayMessages() {
-      noMessages.style.display = messages.length ? "none" : "block";
-      inbox.innerHTML = messages.length
-        ? messages.map(msg => `
-            <div class="message">
-              <strong>To:</strong> ${msg.to} <br />
-              <strong>Sent:</strong> ${msg.date} <br />
-              <p>${msg.text}</p>
-            </div>
-          `).join("")
-        : '<p id="noMessages">No messages yet.</p>';
-    }
-
-    // On page load
-    displayMessages();
-
-      const widget = document.getElementById('widget');
-
-widget.querySelectorAll('button').forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    switch(idx) {
-      case 0: // Profile
-        window.location.href = 'user-profile.html';
-        break;
-      case 1: // Settings
-        window.location.href = 'settings.html';
-        break;
-      case 2: // Menu
-        window.location.href = 'menu.html';
-        break;
-      case 3: // Messages
-        window.location.href = 'messages.html'; 
-        break;
-    }
-  });
-});
-
-  </script>
-
-</body>
-</html>
-
+  <
