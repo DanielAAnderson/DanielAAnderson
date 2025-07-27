@@ -6,7 +6,80 @@
   <title>User Profile - Forever Lockedin</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* … your existing styles … */
+    .profile-container {
+      max-width: 700px;
+      margin: 60px auto 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid #f57c00;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .bio {
+      margin-top: 10px;
+      width: 100%;
+      min-height: 80px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      resize: vertical;
+    }
+    .background-picker {
+      margin-top: 15px;
+    }
+    .stats-section {
+      margin-top: 30px;
+    }
+    .stats-section h3 {
+      margin-bottom: 10px;
+    }
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .stats-table th,
+    .stats-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .stats-table th {
+      background-color: #f57c00;
+      color: white;
+    }
+    .posts-section {
+      margin-top: 30px;
+    }
+    .post {
+      border-top: 1px solid #ddd;
+      padding: 10px 0;
+      font-size: 1rem;
+      color: #212121;
+    }
+    .post img {
+      max-width: 100%;
+      max-height: 200px;
+      margin-top: 8px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
@@ -19,7 +92,7 @@
   <div class="profile-container">
     <h2>User Profile</h2>
 
-    <!-- Stats Table -->
+    <!-- NEW: Stats Table -->
     <div class="stats-section">
       <h3>Profile Stats</h3>
       <table class="stats-table">
@@ -32,16 +105,6 @@
           <td><span id="postCount">0</span></td>
         </tr>
       </table>
-    </div>
-
-    <!-- NEW: Add Friend UI -->
-    <div class="add-friend-section">
-      <h3>Add a Friend</h3>
-      <input id="newFriendInput" type="text" placeholder="Friend’s email/name" />
-      <button id="addFriendBtn">Add Friend</button>
-      <ul id="friendList">
-        <!-- populated by JS -->
-      </ul>
     </div>
 
     <div class="profile-header">
@@ -75,12 +138,13 @@
     <button title="Messages"><img src="key-hole.png" alt="Msg" /></button>
   </div>
 
+  <!-- Combined Auth + Firestore + existing logic -->
   <script type="module">
     // 1) Firebase App & Auth imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    // 2) Firestore imports (now includes getFirestore)
+    // 2) Firestore imports
     import {
       getFirestore,
       doc,
@@ -113,10 +177,6 @@
     const postsEl              = document.getElementById("posts");
     const friendCountEl        = document.getElementById("friendCount");
     const postCountEl          = document.getElementById("postCount");
-    const newFriendInput       = document.getElementById("newFriendInput");
-    const addFriendBtn         = document.getElementById("addFriendBtn");
-    const friendListEl         = document.getElementById("friendList");
-    const widget               = document.getElementById("widget");
 
     let friends = [];
 
@@ -127,18 +187,20 @@
         return;
       }
       const userDoc = doc(db, "users", user.uid);
+      // ensure the doc exists
       setDoc(userDoc, { friends: [] }, { merge: true });
+      // listen for updates
       onSnapshot(userDoc, snap => {
         const data = snap.data() || {};
         friends = data.friends || [];
-        renderFriends();
+        // update stats
+        friendCountEl.textContent = friends.length;
       });
-
-      // 7) Load posts & stats (your existing function)
+      // load posts & postCount
       loadPosts();
     });
 
-    // 8) Existing localStorage + posts logic
+    // 7) Existing localStorage + posts logic
     if (localStorage.getItem("profilePic")) {
       profilePic.src = localStorage.getItem("profilePic");
     }
@@ -188,28 +250,9 @@
       }
       postCountEl.textContent = dummyPosts.length;
     }
-
-    // 9) **Add‑Friend snippet** (firestore-backed)
-    function renderFriends() {
-      friendCountEl.textContent = friends.length;
-      if (!friends.length) {
-        friendListEl.innerHTML = "<li>No friends yet.</li>";
-      } else {
-        friendListEl.innerHTML = friends.map(f => `<li>${f}</li>`).join("");
-      }
-    }
-
-    addFriendBtn.addEventListener("click", async () => {
-      const name = newFriendInput.value.trim();
-      if (!name) return alert("Enter a name.");
-      const user = auth.currentUser;
-      const userDoc = doc(db, "users", user.uid);
-      await updateDoc(userDoc, { friends: arrayUnion(name) });
-      newFriendInput.value = "";
-      // onSnapshot will re‑render automatically
-    });
-
-    // 10) Widget navigation (unchanged)
+    
+    // 8) Widget navigation (unchanged)
+    const widget = document.getElementById('widget');
     widget.querySelectorAll('button').forEach((btn, idx) => {
       btn.addEventListener('click', () => {
         switch (idx) {
