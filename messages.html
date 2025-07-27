@@ -100,8 +100,74 @@
       text-align: center;
       padding: 40px 0;
     }
+  </style>
+</head>
+<body>
 
-    /* --- Widget Styles --- */
+  <h2>Inbox</h2>
+
+  <div class="inbox" id="inbox">
+    <p id="noMessages">No messages yet.</p>
+  </div>
+
+  <div class="message-form">
+    <h3>Send a Message</h3>
+    <form id="messageForm">
+      <label for="recipient">To:</label>
+      <select id="recipient" required>
+        <option value="" disabled selected>No users available</option>
+      </select>
+      <label for="messageText">Message:</label>
+      <textarea id="messageText" placeholder="Type your message here..." required></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script>
+    const inbox = document.getElementById("inbox");
+    const form = document.getElementById("messageForm");
+    const messageText = document.getElementById("messageText");
+    const noMessages = document.getElementById("noMessages");
+
+    let messages = []; // For now, just in-memory
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const text = messageText.value.trim();
+      const recipient = document.getElementById("recipient").value;
+      if (!text || !recipient) return;
+
+      const message = {
+        to: recipient,
+        text,
+        date: new Date().toLocaleString()
+      };
+
+      messages.push(message);
+      displayMessages();
+      form.reset();
+    });
+
+    function displayMessages() {
+      noMessages.style.display = messages.length ? "none" : "block";
+      inbox.innerHTML = messages.length
+        ? messages.map(msg => `
+            <div class="message">
+              <strong>To:</strong> ${msg.to} <br />
+              <strong>Sent:</strong> ${msg.date} <br />
+              <p>${msg.text}</p>
+            </div>
+          `).join("")
+        : '<p id="noMessages">No messages yet.</p>';
+    }
+
+    // On page load
+    displayMessages();
+  </script>
+
+  <!-- Widget Styles -->
+  <style>
     .widget {
       position: absolute;
       bottom: 20px;
@@ -121,11 +187,46 @@
       height: 32px;
     }
   </style>
-</head>
-<body>
 
-  <h2>Inbox</h2>
+  <!-- Widget Markup -->
+  <div class="widget" id="widget">
+    <a href="userprofile.html" title="Profile">
+      <img src="padlock.png" alt="Profile">
+    </a>
+    <a href="settings.html" title="Settings">
+      <img src="dial.png" alt="Settings">
+    </a>
+    <a href="menu.html" title="Menu">
+      <img src="door-key.png" alt="Menu">
+    </a>
+    <a href="messages.html" title="Messages">
+      <img src="key-hole.png" alt="Messages">
+    </a>
+  </div>
 
-  <div class="inbox" id="inbox">
-    <p id="noMessages">No messages yet.</p>
-  <
+  <!-- Widget Drag-and-Drop Script -->
+  <script>
+    const widget = document.getElementById("widget");
+    let isDragging = false, offsetX = 0, offsetY = 0;
+
+    widget.addEventListener("mousedown", e => {
+      isDragging = true;
+      offsetX = e.clientX - widget.offsetLeft;
+      offsetY = e.clientY - widget.offsetTop;
+      widget.style.bottom = "auto";
+      widget.style.right  = "auto";
+    });
+
+    document.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      widget.style.left = (e.clientX - offsetX) + "px";
+      widget.style.top  = (e.clientY - offsetY) + "px";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+  </script>
+
+</body>
+</html>
