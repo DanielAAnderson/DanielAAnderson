@@ -1,4 +1,33 @@
 /* styles.css */
+/* 1) Make every element box‑sized */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2) Ensure html/body fill the viewport */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 3) Your main containers: fluid yet capped */
+.signup-container,
+.inbox,
+.message-form {
+  width: 90%;
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+/* 4) Make the T&C scrollable but not off‑screen */
+.terms {
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
 body {
   margin: 0;
   padding: 0;

@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="styles.css">
   <title>Sign Up - Forever Lockedin</title>
   <style>
     body {
@@ -106,3 +108,16 @@
       - No data is uploaded to a database or shared externally.</p>
       <p><strong>4. Limitations</strong><br>
       - Some buttons
+
+        <!-- Auto‑fill the Effective Date -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const eff = document.getElementById("effectiveDate");
+      if (eff) {
+        // e.g. “7/29/2025” or format to your locale
+        eff.textContent = new Date().toLocaleDateString();
+      }
+    });
+  </script>
+</body>
+</html>
