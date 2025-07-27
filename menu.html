@@ -70,31 +70,77 @@
     .menu-search button:hover {
       background-color: #ef6c00;
     }
+    /* new: find‑friends UI */
+    .find-friends {
+      margin-top: 30px;
+      text-align: left;
+    }
+    .find-friends h3 {
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+    .find-friends select {
+      width: 65%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-right: 8px;
+      font-size: 1rem;
+    }
+    .find-friends button {
+      padding: 8px 16px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .find-friends button:hover {
+      background-color: #1b5e20;
+    }
   </style>
 </head>
 <body>
 
   <!-- Logo top right -->
-  <a href="forever-home.html" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">
-    <img src="lock.png" alt="Forever Logo" style="height: 40px; cursor: pointer;" />
+  <a href="forever-home.html"
+     style="position: fixed; top: 20px; right: 20px; z-index: 1100;">
+    <img src="lock.png" alt="Forever Logo"
+         style="height: 40px; cursor: pointer;" />
   </a>
 
   <div class="menu-container">
     <h2>Menu</h2>
     
     <div class="dropdown">
-      <button id="menuBtn" style="width: 100%; padding: 10px; font-weight: 700; background: #2e7d32; color: white; border: none; border-radius: 8px; cursor: pointer;">
+      <button id="menuBtn"
+              style="width: 100%; padding: 10px; font-weight: 700;
+                     background: #2e7d32; color: white;
+                     border: none; border-radius: 8px;
+                     cursor: pointer;">
         Open Menu ▼
       </button>
       <div class="dropdown-content" id="dropdownContent">
-        <button onclick="goTo('search-friends.html')">Search for Friends</button>
-        <button onclick="goTo('marketplace.html')">Marketplace</button>
+        <button onclick="goTo('menu.html')">Main Menu</button>
+        <button onclick="goTo('menu.html')">Refresh</button>
       </div>
     </div>
 
     <div class="menu-search">
-      <input type="text" id="externalSearchInput" placeholder="Search outside website..." />
+      <input type="text" id="externalSearchInput"
+             placeholder="Search outside website..." />
       <button id="externalSearchBtn">Search</button>
+    </div>
+
+    <!-- new: find-friends section -->
+    <div class="find-friends">
+      <h3>Find Friends</h3>
+      <select id="allUsers">
+        <option>Loading users…</option>
+      </select>
+      <button id="viewProfileBtn">View Profile</button>
     </div>
   </div>
 
@@ -106,76 +152,94 @@
     <button title="Messages"><img src="key-hole.png" alt="Msg" /></button>
   </div>
 
-  <script>
-    const menuBtn = document.getElementById("menuBtn");
-    const dropdown = document.getElementById("dropdownContent");
-    const externalSearchBtn = document.getElementById("externalSearchBtn");
-    const externalSearchInput = document.getElementById("externalSearchInput");
+  <script type="module">
+    // 1) Firebase core
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+    // 2) Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+      authDomain: "forever-lockedin.firebaseapp.com",
+      projectId: "forever-lockedin",
+      storageBucket: "forever-lockedin.firebasestorage.app",
+      messagingSenderId: "1046869755533",
+      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+    };
+
+    // 3) Initialize
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // DOM refs
+    const menuBtn            = document.getElementById("menuBtn");
+    const dropdown           = document.getElementById("dropdownContent");
+    const externalSearchBtn  = document.getElementById("externalSearchBtn");
+    const externalSearchInput= document.getElementById("externalSearchInput");
+    const allUsers           = document.getElementById("allUsers");
+    const viewProfileBtn     = document.getElementById("viewProfileBtn");
+    const widget             = document.getElementById("widget");
+
+    // dropdown toggle
     menuBtn.addEventListener("click", () => {
-      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+      dropdown.style.display = dropdown.style.display === "block"
+                              ? "none" : "block";
     });
-
     function goTo(page) {
       window.location.href = page;
     }
-
+    // external search
     externalSearchBtn.addEventListener("click", () => {
-      const query = externalSearchInput.value.trim();
-      if (!query) {
-        alert("Please enter a search query.");
-        return;
-      }
-      const confirmed = confirm("You are about to leave Forever Lockedin and go to an external website. Continue?");
-      if (confirmed) {
-        // For demo, redirect to Google search with the query
-        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        window.location.href = searchUrl;
+      const q = externalSearchInput.value.trim();
+      if (!q) return alert("Please enter a search query.");
+      if (confirm("You are about to leave Forever Lockedin. Continue?")) {
+        window.location.href =
+          `https://www.google.com/search?q=${encodeURIComponent(q)}`;
       }
     });
+    window.onclick = e => {
+      if (!e.target.matches('#menuBtn'))
+        dropdown.style.display = 'none';
+    };
 
-    // Close dropdown if clicked outside
-    window.onclick = function(event) {
-      if (!event.target.matches('#menuBtn')) {
-        if (dropdown.style.display === "block") {
-          dropdown.style.display = "none";
+    // 4) Populate users dropdown from Firestore
+    onAuthStateChanged(auth, user => {
+      if (!user) return window.location.href = "index.html";
+      onSnapshot(collection(db, "users"), snap => {
+        allUsers.innerHTML = snap.docs
+          .filter(d => d.id !== user.uid)
+          .map(d => {
+            const email = d.data().email || d.id;
+            return `<option value="${d.id}">${email}</option>`;
+          })
+          .join("") || `<option disabled>No other users</option>`;
+      });
+    });
+
+    // 5) View Profile button
+    viewProfileBtn.addEventListener("click", () => {
+      const uid = allUsers.value;
+      if (!uid) return alert("Select someone first.");
+      window.location.href = `userprofile.html?uid=${uid}`;
+    });
+
+    // 6) Widget navigation
+    widget.querySelectorAll('button').forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        switch (i) {
+          case 0: window.location.href = 'userprofile.html'; break;
+          case 1: window.location.href = 'settings.html';    break;
+          case 2: window.location.href = 'menu.html';        break;
+          case 3: window.location.href = 'messages.html';    break;
         }
-      }
-    }
-
-    const widget = document.getElementById('widget');
-
-widget.querySelectorAll('button').forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    switch(idx) {
-      case 0: // Profile
-        window.location.href = 'userprofile.html';
-        break;
-      case 1: // Settings
-        window.location.href = 'settings.html';
-        break;
-      case 2: // Menu
-        window.location.href = 'menu.html';
-        break;
-      case 3: // Messages
-        window.location.href = 'messages.html'; 
-        break;
-    }
-  });
-});
-
-onSnapshot(collection(db, "users"), snap => {
-  allUsers.innerHTML = snap.docs
-    .filter(d => d.id !== auth.currentUser.uid)
-    .map(d => `<option value="${d.id}">${d.data().email}</option>`)
-    .join("");
-});
-document.getElementById("viewProfileBtn").onclick = () => {
-  const uid = allUsers.value;
-  location.href = `userprofile.html?uid=${uid}`;
-};
-
+      });
+    });
   </script>
-
 </body>
 </html>
