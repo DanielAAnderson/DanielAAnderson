@@ -33,6 +33,60 @@
       max-height: 200px;
       margin-top: 10px;
     }
+
+    /* Intro modal styles */
+    .intro-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .intro-content {
+      background: #fff;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 600px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .intro-slide {
+      display: none;
+    }
+    .intro-slide.active {
+      display: block;
+    }
+    .intro-slide img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 15px;
+    }
+    .intro-controls {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .intro-controls button {
+      background: #f57c00;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .intro-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -71,6 +125,37 @@
     </a>
   </div>
 
+  <!-- Introductory Modal -->
+  <div class="intro-modal" id="introModal">
+    <div class="intro-content">
+      <button class="intro-close" id="introClose">×</button>
+      <div class="intro-slide active">
+        <img src="slide1.jpg" alt="Slide 1">
+        <p>Welcome to Forever Lockedin! Stay connected with temporary posts.</p>
+      </div>
+      <div class="intro-slide">
+        <img src="slide2.jpg" alt="Slide 2">
+        <p>Create text or image posts that live only on your browser.</p>
+      </div>
+      <div class="intro-slide">
+        <img src="slide3.jpg" alt="Slide 3">
+        <p>Use the floating widget to navigate to Profile, Settings, Menu, and Messages.</p>
+      </div>
+      <div class="intro-slide">
+        <img src="slide4.jpg" alt="Slide 4">
+        <p>All your data is local and deleted upon refresh or closing the tab.</p>
+      </div>
+      <div class="intro-slide">
+        <img src="slide5.jpg" alt="Slide 5">
+        <p>Enjoy exploring! This app is for educational purposes only.</p>
+      </div>
+      <div class="intro-controls">
+        <button id="prevSlide">Previous</button>
+        <button id="nextSlide">Next</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -100,6 +185,8 @@
     onAuthStateChanged(auth, user => {
       if (user) {
         userEmailEl.textContent = user.email;
+        // Show intro modal on first login
+        document.getElementById('introModal').style.display = 'flex';
       } else {
         window.location.href = "forever-home.html"; // Redirect if not logged in
       }
@@ -147,7 +234,6 @@
   widget.style.right  = "auto";
 });
 
-
     document.addEventListener("mousemove", e => {
       if (isDragging) {
         const newX = e.clientX - offsetX;
@@ -161,6 +247,23 @@
 
     document.addEventListener("mouseup", () => {
       isDragging = false;
+    });
+
+    // Intro modal logic
+    const slides = document.querySelectorAll('.intro-slide');
+    let currentSlide = 0;
+    document.getElementById('nextSlide').addEventListener('click', () => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    });
+    document.getElementById('prevSlide').addEventListener('click', () => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+    });
+    document.getElementById('introClose').addEventListener('click', () => {
+      document.getElementById('introModal').style.display = 'none';
     });
   </script>
 
