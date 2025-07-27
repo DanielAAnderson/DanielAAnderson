@@ -17,21 +17,70 @@
   </a>
 
   <div class="profile-container">
-    <!-- … your existing markup up through the Add Friend UI … -->
+    <h2>User Profile</h2>
+
+    <!-- Stats Table -->
+    <div class="stats-section">
+      <h3>Profile Stats</h3>
+      <table class="stats-table">
+        <tr>
+          <th>Friends</th>
+          <td><span id="friendCount">0</span></td>
+        </tr>
+        <tr>
+          <th>Posts</th>
+          <td><span id="postCount">0</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- NEW: Add Friend UI -->
+    <div class="add-friend-section">
+      <h3>Add a Friend</h3>
+      <input id="newFriendInput" type="text" placeholder="Friend’s email/name" />
+      <button id="addFriendBtn">Add Friend</button>
+      <ul id="friendList">
+        <!-- populated by JS -->
+      </ul>
+    </div>
+
+    <div class="profile-header">
+      <label for="profilePicInput">
+        <img id="profilePic" class="profile-pic" src="default-profile.png" alt="Profile Picture" title="Click to change profile picture" />
+      </label>
+      <input type="file" id="profilePicInput" accept="image/*" />
+    </div>
+
+    <label for="bioInput"><strong>Bio:</strong></label>
+    <textarea id="bioInput" class="bio" placeholder="Tell us about yourself..."></textarea>
+
+    <div class="background-picker">
+      <label for="backgroundColor">Change Background Color:</label>
+      <input type="color" id="backgroundColor" value="#ffffff" />
+    </div>
+
+    <div class="posts-section">
+      <h3>Recent Posts</h3>
+      <div id="posts">
+        <p>No posts yet.</p>
+      </div>
+    </div>
   </div>
 
   <!-- Widget -->
   <div class="widget" id="widget">
-    <!-- … -->
+    <button title="Profile"><img src="padlock.png" alt="P" /></button>
+    <button title="Settings"><img src="dial.png" alt="S" /></button>
+    <button title="Menu"><img src="door-key.png" alt="M" /></button>
+    <button title="Messages"><img src="key-hole.png" alt="Msg" /></button>
   </div>
 
-  <!-- Combined Auth + Firestore + existing logic -->
   <script type="module">
-    // 1️⃣ Firebase App & Auth imports
+    // 1) Firebase App & Auth imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    // 2️⃣ Firestore imports
+    // 2) Firestore imports (now includes getFirestore)
     import {
       getFirestore,
       doc,
@@ -41,7 +90,7 @@
       arrayUnion
     } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    // 3️⃣ Firebase config
+    // 3) Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
       authDomain: "forever-lockedin.firebaseapp.com",
@@ -51,20 +100,27 @@
       appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
     };
 
-    // 4️⃣ Initialize services
+    // 4) Initialize services
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
-    // 5️⃣ DOM refs (added only these—the rest remain as you had them)
-    const newFriendInput = document.getElementById("newFriendInput");
-    const addFriendBtn   = document.getElementById("addFriendBtn");
-    const friendListEl   = document.getElementById("friendList");
-    const friendCountEl  = document.getElementById("friendCount");
+    // 5) DOM refs
+    const profilePicInput      = document.getElementById("profilePicInput");
+    const profilePic           = document.getElementById("profilePic");
+    const bioInput             = document.getElementById("bioInput");
+    const backgroundColorInput = document.getElementById("backgroundColor");
+    const postsEl              = document.getElementById("posts");
+    const friendCountEl        = document.getElementById("friendCount");
+    const postCountEl          = document.getElementById("postCount");
+    const newFriendInput       = document.getElementById("newFriendInput");
+    const addFriendBtn         = document.getElementById("addFriendBtn");
+    const friendListEl         = document.getElementById("friendList");
+    const widget               = document.getElementById("widget");
 
-    let friends = []; // will be replaced by Firestore onSnapshot
+    let friends = [];
 
-    // 6️⃣ Auth + Firestore subscription (unchanged from your code)
+    // 6) Auth + Firestore subscription
     onAuthStateChanged(auth, user => {
       if (!user) {
         window.location.href = "index.html";
@@ -75,17 +131,65 @@
       onSnapshot(userDoc, snap => {
         const data = snap.data() || {};
         friends = data.friends || [];
-        renderFriends();   // ← render whenever Firestore updates
+        renderFriends();
       });
-      loadPosts();         // ← your existing call
+
+      // 7) Load posts & stats (your existing function)
+      loadPosts();
     });
 
-    // 7️⃣ Your existing localStorage + posts logic…
-    //    (profile pic, bio, bg color, dummyPosts, loadPosts, etc.)
+    // 8) Existing localStorage + posts logic
+    if (localStorage.getItem("profilePic")) {
+      profilePic.src = localStorage.getItem("profilePic");
+    }
+    if (localStorage.getItem("bio")) {
+      bioInput.value = localStorage.getItem("bio");
+    }
+    if (localStorage.getItem("bgColor")) {
+      document.body.style.backgroundColor = localStorage.getItem("bgColor");
+      backgroundColorInput.value = localStorage.getItem("bgColor");
+    }
 
-    // 8️⃣ Friends‑replacement snippet **inserted here**:
+    profilePicInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        profilePic.src = evt.target.result;
+        localStorage.setItem("profilePic", evt.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
 
-    // render function
+    bioInput.addEventListener("input", () => {
+      localStorage.setItem("bio", bioInput.value);
+    });
+
+    backgroundColorInput.addEventListener("input", () => {
+      document.body.style.backgroundColor = backgroundColorInput.value;
+      localStorage.setItem("bgColor", backgroundColorInput.value);
+    });
+
+    const dummyPosts = [
+      { text: "Just had a great day!", img: "" },
+      { text: "Check out this photo.", img: "sample-photo.jpg" }
+    ];
+
+    function loadPosts() {
+      if (dummyPosts.length === 0) {
+        postsEl.innerHTML = "<p>No posts yet.</p>";
+      } else {
+        postsEl.innerHTML = dummyPosts.map(post => `
+          <div class="post">
+            <p>${post.text}</p>
+            ${post.img ? `<img src="${post.img}" alt="Post image">` : ""}
+          </div>
+        `).join("");
+      }
+      postCountEl.textContent = dummyPosts.length;
+    }
+
+    // 9) **Add‑Friend snippet** (firestore-backed)
     function renderFriends() {
       friendCountEl.textContent = friends.length;
       if (!friends.length) {
@@ -95,7 +199,6 @@
       }
     }
 
-    // add‑friend handler
     addFriendBtn.addEventListener("click", async () => {
       const name = newFriendInput.value.trim();
       if (!name) return alert("Enter a name.");
@@ -103,13 +206,20 @@
       const userDoc = doc(db, "users", user.uid);
       await updateDoc(userDoc, { friends: arrayUnion(name) });
       newFriendInput.value = "";
-      // onSnapshot will trigger renderFriends()
+      // onSnapshot will re‑render automatically
     });
 
-    // initial render in case onSnapshot is slightly delayed
-    renderFriends();
-
-    // 9️⃣ Rest of your existing widget‑nav code…
+    // 10) Widget navigation (unchanged)
+    widget.querySelectorAll('button').forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        switch (idx) {
+          case 0: window.location.href = 'userprofile.html'; break;
+          case 1: window.location.href = 'settings.html';    break;
+          case 2: window.location.href = 'menu.html';        break;
+          case 3: window.location.href = 'messages.html';    break;
+        }
+      });
+    });
   </script>
 </body>
 </html>
