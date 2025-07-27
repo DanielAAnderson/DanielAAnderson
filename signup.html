@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
   <title>Sign Up - Forever Lockedin</title>
   <style>
     body {
@@ -21,20 +21,15 @@
       background-color: rgba(255, 255, 255, 0.95);
       padding: 40px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 320px;
-    }
-
-    .signup-container h2 {
-      margin-top: 0;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      width: 350px;
       text-align: center;
-      color: #003366;
     }
 
     .signup-container input {
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
+      margin: 8px 0;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
@@ -51,32 +46,12 @@
       font-size: 16px;
     }
 
-    .signup-container .back-link {
+    .back-link {
       display: block;
-      text-align: center;
       margin-top: 15px;
+      font-size: 14px;
       color: #003366;
       text-decoration: none;
-    }
-
-    /* Terms & Conditions styling */
-    .terms {
-      margin-top: 20px;
-      font-size: 0.9rem;
-      color: #333;
-      line-height: 1.4;
-      max-height: 200px;
-      overflow-y: auto;
-      border-top: 1px solid #ddd;
-      padding-top: 15px;
-    }
-    .terms h3 {
-      margin: 0 0 10px;
-      font-size: 1.1rem;
-      color: #f57c00;
-    }
-    .terms p {
-      margin: 8px 0;
     }
   </style>
 </head>
@@ -88,35 +63,38 @@
       <input type="password" id="signup-password" placeholder="Password" required />
       <button type="submit">Sign Up</button>
     </form>
+    <a href="index.html" class="back-link">Already have an account? Login</a>
+  </div>
 
-    <!-- Terms & Conditions -->
-    <div class="terms">
-      <h3>Terms and Conditions</h3>
-      <p><strong>Effective Date:</strong> <span id="effectiveDate"></span></p>
-      <p>Welcome to our social media app! This project is created for educational purposes only as part of a class assignment.</p>
-      <p><strong>1. About the App</strong><br>
-      - This app allows users to create temporary text and image posts.<br>
-      - Posts and images are not stored on any server.<br>
-      - All data is stored locally in your browser (on your own device).<br>
-      - No one else can see your posts — they are not shared publicly or with other users.</p>
-      <p><strong>2. User Accounts</strong><br>
-      - We use Firebase to handle email and password authentication.<br>
-      - This is only used to verify identity — no other personal data is stored or used.</p>
-      <p><strong>3. Data Storage</strong><br>
-      - All posts and uploaded images are saved only in your browser (local storage).<br>
-      - When you refresh or close the page, all posts are deleted and cannot be recovered.<br>
-      - No data is uploaded to a database or shared externally.</p>
-      <p><strong>4. Limitations</strong><br>
-      - Some buttons
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        <!-- Auto‑fill the Effective Date -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const eff = document.getElementById("effectiveDate");
-      if (eff) {
-        // e.g. “7/29/2025” or format to your locale
-        eff.textContent = new Date().toLocaleDateString();
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+      authDomain: "forever-lockedin.firebaseapp.com",
+      projectId: "forever-lockedin",
+      storageBucket: "forever-lockedin.firebasestorage.app",
+      messagingSenderId: "1046869755533",
+      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Signup successful!");
+          window.location.href = "forever-home.html";
+        })
+        .catch((error) => {
+          alert("Signup error: " + error.message);
+        });
     });
   </script>
 </body>
