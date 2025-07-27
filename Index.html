@@ -2,27 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css" />
   <title>Forever Lockedin - Login</title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4; /* Background removed for now */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      color: #212121;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
+    .login-wrapper {
+      display: flex;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
     .login-container {
-      background-color: rgba(255, 255, 255, 0.95);
       padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      width: 300px;
+      width: 350px;
       text-align: center;
     }
 
@@ -36,34 +42,75 @@
 
     .login-container button {
       width: 100%;
-      padding: 10px;
-      background-color: #003366;
+      padding: 12px;
+      background-color: #f57c00;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       margin-top: 10px;
       cursor: pointer;
       font-size: 16px;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-container button:hover {
+      background-color: #ef6c00;
     }
 
     .signup-link {
+      display: block;
       margin-top: 15px;
       font-size: 14px;
-      display: block;
+      color: #2e7d32;
       text-decoration: none;
-      color: #003366;
+    }
+
+    .info-container {
+      background: #2e7d32;
+      color: #fff;
+      padding: 40px;
+      width: 350px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: left;
+    }
+
+    .info-container h2 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+
+    .info-container p {
+      margin: 0 0 20px;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .info-container h3 {
+      margin: 0;
+      font-size: 18px;
+      font-style: italic;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login</h1>
-    <form id="loginForm">
-      <input type="email" id="login-email" placeholder="Email" required />
-      <input type="password" id="login-password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-    <a class="signup-link" href="signup.html">Don't have an account? Sign up</a>
+  <div class="login-wrapper">
+    <div class="login-container">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+      <a class="signup-link" href="signup.html">Don't have an account? Sign Up</a>
+    </div>
+    <div class="info-container">
+      <h2>Welcome to Forever lockedin</h2>
+      <p>Where you can stay locked in.</p>
+      <h3>"stronger together. Locked in forever."</h3>
+    </div>
   </div>
 
   <script type="module">
@@ -90,7 +137,7 @@
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           alert("Login successful!");
-          window.location.href = "forever-home.html"; // homepage link
+          window.location.href = "forever-home.html";
         })
         .catch((error) => {
           alert("Login error: " + error.message);
