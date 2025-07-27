@@ -133,13 +133,13 @@
       </table>
     </div>
 
-    <!-- Add Friend UI -->
+    <!-- Add Friend UI (hidden by default) -->
     <div class="add-friend-section" id="addFriendSection" style="display: none;">
       <h3>Add a Friend</h3>
       <input id="newFriendInput" type="text" placeholder="Friend’s email/name" />
       <button id="addFriendBtn">Add Friend</button>
       <ul id="friendList">
-        <!-- JS will populate -->
+        <!-- populated by JS -->
       </ul>
     </div>
 
@@ -188,9 +188,7 @@
       collection,
       query,
       where,
-      orderBy,
-      addDoc,
-      serverTimestamp
+      orderBy
     } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
     // 2) Firebase config
@@ -203,14 +201,13 @@
       appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
     };
 
-    // 3) Initialize
+    // 3) Initialize Firebase
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
-    // 4) Parse profile UID from URL (or use current)
-    const params     = new URLSearchParams(location.search);
-    const profileUid = params.get("uid") || null;
+    // 4) Parse UID from URL query
+    let profileUid = null;
 
     // 5) DOM refs
     const profilePicInput      = document.getElementById("profilePicInput");
@@ -226,51 +223,46 @@
     const addFriendSection     = document.getElementById("addFriendSection");
     const widget               = document.getElementById("widget");
 
-    let friends = [];
-
-    // 6) Auth state listener
+    // 6) Listen for auth state
     onAuthStateChanged(auth, async user => {
       if (!user) {
-        // not logged in
-        return window.location.href = "index.html";
+        window.location.href = "index.html";
+        return;
       }
 
-      // determine which profile to show
-      const uidToShow = profileUid || user.uid;
+      // Now auth.currentUser is defined
+      const params = new URLSearchParams(location.search);
+      profileUid = params.get("uid") || user.uid;
 
-      // 6a) Ensure user doc exists
-      const meDoc = doc(db, "users", user.uid);
-      await setDoc(meDoc, {}, { merge: true });
+      // Ensure logged‑in user's doc exists
+      await setDoc(doc(db, "users", user.uid), {}, { merge: true });
 
-      // 6b) Subscribe to profile data
-      const profileDoc = doc(db, "users", uidToShow);
-      onSnapshot(profileDoc, snap => {
+      // 7) Subscribe to profile data
+      onSnapshot(doc(db, "users", profileUid), snap => {
         const data = snap.data() || {};
-        // fill bio
         bioInput.value = data.bio || "";
-        // fill friends list & count
-        friends = data.friends || [];
+        const friends = data.friends || [];
         friendCountEl.textContent = friends.length;
         friendListEl.innerHTML = friends.length
           ? friends.map(f => `<li><a href="userprofile.html?uid=${f}">${f}</a></li>`).join("")
           : "<li>No friends yet.</li>";
       });
 
-      // 6c) Show Add‑Friend only if viewing someone else's profile
-      if (uidToShow !== user.uid) {
+      // 8) Show Add‑Friend only for other users
+      if (profileUid !== user.uid) {
         addFriendSection.style.display = "block";
       }
 
-      // 6d) Subscribe to this user's posts
-      const userPostsQ = query(
+      // 9) Subscribe to that user's posts
+      const postsQ = query(
         collection(db, "posts"),
-        where("authorUid", "==", uidToShow),
+        where("authorUid", "==", profileUid),
         orderBy("createdAt", "desc")
       );
-      onSnapshot(userPostsQ, snap => {
+      onSnapshot(postsQ, snap => {
         postsEl.innerHTML = "";
-        snap.forEach(docSnap => {
-          const p = docSnap.data();
+        snap.forEach(d => {
+          const p = d.data();
           const div = document.createElement("div");
           div.className = "post";
           div.innerHTML = `
@@ -283,22 +275,22 @@
       });
     });
 
-    // 7) Add‑Friend button handler
+    // 10) Add‑Friend handler
     addFriendBtn.addEventListener("click", async () => {
       const name = newFriendInput.value.trim();
       if (!name) {
-        return alert("Enter a name.");
+        alert("Enter a name.");
+        return;
       }
-      const user = auth.currentUser;
-      const userDoc = doc(db, "users", user.uid);
+      const userDoc = doc(db, "users", auth.currentUser.uid);
       await updateDoc(userDoc, {
-        friends: arrayUnion(profileUid || user.uid)
+        friends: arrayUnion(profileUid)
       });
-      newFriendInput.value = "";
       alert("Friend added!");
+      newFriendInput.value = "";
     });
 
-    // 8) LocalStorage for profile pic, bio, bgColor (unchanged)
+    // 11) LocalStorage for pic, bio, bgColor (unchanged)
     if (localStorage.getItem("profilePic")) {
       profilePic.src = localStorage.getItem("profilePic");
     }
@@ -327,14 +319,14 @@
       localStorage.setItem("bgColor", backgroundColorInput.value);
     });
 
-    // 9) Widget navigation (unchanged)
+    // 12) Widget navigation (unchanged)
     widget.querySelectorAll('button').forEach((btn, idx) => {
       btn.addEventListener('click', () => {
         switch (idx) {
-          case 0: return window.location.href = 'userprofile.html';
-          case 1: return window.location.href = 'settings.html';
-          case 2: return window.location.href = 'menu.html';
-          case 3: return window.location.href = 'messages.html';
+          case 0: window.location.href = 'userprofile.html'; break;
+          case 1: window.location.href = 'settings.html';    break;
+          case 2: window.location.href = 'menu.html';        break;
+          case 3: window.location.href = 'messages.html';    break;
         }
       });
     });
