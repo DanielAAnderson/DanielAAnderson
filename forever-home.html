@@ -132,11 +132,16 @@
     // Drag logic
     let isDragging = false, offsetX = 0, offsetY = 0;
 
-    widget.addEventListener("mousedown", e => {
-      isDragging = true;
-      offsetX = e.clientX - widget.offsetLeft;
-      offsetY = e.clientY - widget.offsetTop;
-    });
+   widget.addEventListener("mousedown", e => {
+  isDragging = true;
+  offsetX = e.clientX - widget.offsetLeft;
+  offsetY = e.clientY - widget.offsetTop;
+
+  // ✨ Clear out the bottom/right anchors so left/top take effect ✨
+  widget.style.bottom = "auto";
+  widget.style.right  = "auto";
+});
+
 
     document.addEventListener("mousemove", e => {
       if (isDragging) {

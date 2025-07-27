@@ -84,18 +84,27 @@ button:hover {
 }
 
 .widget {
-  position: fixed;
-  left: 20px;
-  top: 20px;
-  background: white;
-  border: 2px solid #2e7d32; /* dark green border */
-  border-radius: 12px;
-  padding: 10px;
-  width: 90px;
-  cursor: move;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  z-index: 1000;
-}
+      position: absolute;
+      /* default “docked” spot before you drag */
+      bottom: 20px;
+      right: 20px;
+
+      /* make the icons line up in a row */
+      display: flex;
+      flex-direction: row;    /* <-- force horizontal layout */
+      gap: 10px;              /* <-- space between icons */
+
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: move;
+      z-index: 1000;
+    }
+    .widget img {
+      width: 32px;
+      height: 32px;
+    }
 
 .widget button {
   display: block;
