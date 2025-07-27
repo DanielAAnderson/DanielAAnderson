@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css" />
   <title>Inbox - Forever Lockedin</title>
   <style>
     body {
@@ -107,7 +107,7 @@
 <body>
 
   <h2>Inbox</h2>
-<a href="forever-home.html" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">
+  <a href="forever-home.html" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">
     <img src="lock.png" alt="Forever Logo" style="height: 40px; cursor: pointer;" />
   </a>
 
@@ -120,7 +120,7 @@
     <form id="messageForm">
       <label for="recipient">To:</label>
       <select id="recipient" required>
-        <option value="" disabled selected>No users available</option>
+        <option value="" disabled selected>Loading users…</option>
       </select>
       <label for="messageText">Message:</label>
       <textarea id="messageText" placeholder="Type your message here..." required></textarea>
@@ -128,110 +128,130 @@
     </form>
   </div>
 
-  <script>
-    const inbox = document.getElementById("inbox");
-    const form = document.getElementById("messageForm");
-    const messageText = document.getElementById("messageText");
-    const noMessages = document.getElementById("noMessages");
-
-    let messages = []; // For now, just in-memory
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const text = messageText.value.trim();
-      const recipient = document.getElementById("recipient").value;
-      if (!text || !recipient) return;
-
-      const message = {
-        to: recipient,
-        text,
-        date: new Date().toLocaleString()
-      };
-
-      messages.push(message);
-      displayMessages();
-      form.reset();
-    });
-
-    function displayMessages() {
-      noMessages.style.display = messages.length ? "none" : "block";
-      inbox.innerHTML = messages.length
-        ? messages.map(msg => `
-            <div class="message">
-              <strong>To:</strong> ${msg.to} <br />
-              <strong>Sent:</strong> ${msg.date} <br />
-              <p>${msg.text}</p>
-            </div>
-          `).join("")
-        : '<p id="noMessages">No messages yet.</p>';
-    }
-
-    // On page load
-    displayMessages();
-  </script>
-
-  <!-- Widget Styles -->
-  <style>
-    .widget {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      cursor: move;
-      z-index: 1000;
-    }
-    .widget img {
-      width: 32px;
-      height: 32px;
-    }
-  </style>
-
   <!-- Widget Markup -->
   <div class="widget" id="widget">
-    <a href="userprofile.html" title="Profile">
-      <img src="padlock.png" alt="Profile">
-    </a>
-    <a href="settings.html" title="Settings">
-      <img src="dial.png" alt="Settings">
-    </a>
-    <a href="menu.html" title="Menu">
-      <img src="door-key.png" alt="Menu">
-    </a>
-    <a href="messages.html" title="Messages">
-      <img src="key-hole.png" alt="Messages">
-    </a>
+    <a href="userprofile.html" title="Profile"><img src="padlock.png" alt="Profile"></a>
+    <a href="settings.html"   title="Settings"><img src="dial.png"    alt="Settings"></a>
+    <a href="menu.html"       title="Menu"><img src="door-key.png" alt="Menu"></a>
+    <a href="messages.html"   title="Messages"><img src="key-hole.png" alt="Messages"></a>
   </div>
 
-  <!-- Widget Drag-and-Drop Script -->
-  <script>
-    const widget = document.getElementById("widget");
-    let isDragging = false, offsetX = 0, offsetY = 0;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy,
+      onSnapshot,
+      getDocs,
+      doc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    widget.addEventListener("mousedown", e => {
-      isDragging = true;
-      offsetX = e.clientX - widget.offsetLeft;
-      offsetY = e.clientY - widget.offsetTop;
-      widget.style.bottom = "auto";
-      widget.style.right  = "auto";
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+      authDomain: "forever-lockedin.firebaseapp.com",
+      projectId: "forever-lockedin",
+      storageBucket: "forever-lockedin.firebasestorage.app",
+      messagingSenderId: "1046869755533",
+      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+    };
+
+    // Initialize
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // DOM refs
+    const inbox        = document.getElementById("inbox");
+    const noMessages   = document.getElementById("noMessages");
+    const messageForm  = document.getElementById("messageForm");
+    const recipientSel = document.getElementById("recipient");
+    const messageText  = document.getElementById("messageText");
+    const widget       = document.getElementById("widget");
+
+    let currentUser;
+
+    // Auth guard & setup
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+
+      // 1) Populate recipient dropdown from 'users' collection
+      const usersSnap = await getDocs(collection(db, "users"));
+      recipientSel.innerHTML = '<option value="" disabled selected>Select recipient</option>';
+      usersSnap.forEach(docSnap => {
+        const u = docSnap.data();
+        if (docSnap.id === user.uid) return; // skip self
+        recipientSel.innerHTML += `
+          <option value="${docSnap.id}">${u.email || docSnap.id}</option>
+        `;
+      });
+
+      // 2) Subscribe to user's inbox: all messages where toUid == currentUser.uid
+      const inboxQ = query(
+        collection(db, "messages"),
+        orderBy("createdAt", "asc")
+      );
+      onSnapshot(inboxQ, snap => {
+        const msgs = [];
+        snap.forEach(d => {
+          const m = d.data();
+          if (m.toUid === user.uid || m.fromUid === user.uid) {
+            msgs.push(m);
+          }
+        });
+        inbox.innerHTML = msgs.length
+          ? msgs.map(m => `
+              <div class="message ${m.fromUid===user.uid?'sent':'received'}">
+                <strong>${m.fromUid===user.uid?'You to':'From'} ${m.toUid===user.uid? m.fromUid : m.toUid}</strong><br>
+                <small>${new Date(m.createdAt.toMillis()).toLocaleString()}</small>
+                <p>${m.text}</p>
+              </div>
+            `).join("")
+          : '<p id="noMessages">No messages yet.</p>';
+      });
     });
 
-    document.addEventListener("mousemove", e => {
-      if (!isDragging) return;
-      widget.style.left = (e.clientX - offsetX) + "px";
-      widget.style.top  = (e.clientY - offsetY) + "px";
+    // Send message handler
+    messageForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      const toUid = recipientSel.value;
+      const txt   = messageText.value.trim();
+      if (!toUid || !txt) return;
+      await addDoc(collection(db, "messages"), {
+        fromUid: currentUser.uid,
+        toUid,
+        text: txt,
+        createdAt: serverTimestamp()
+      });
+      messageForm.reset();
     });
 
-    document.addEventListener("mouseup", () => {
-      isDragging = false;
+    // Widget navigation
+    widget.querySelectorAll('a').forEach((a, idx) => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        switch (idx) {
+          case 0: return window.location.href = 'userprofile.html';
+          case 1: return window.location.href = 'settings.html';
+          case 2: return window.location.href = 'menu.html';
+          case 3: return window.location.href = 'messages.html';
+        }
+      });
     });
+
   </script>
-
 </body>
 </html>

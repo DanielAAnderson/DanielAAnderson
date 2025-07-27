@@ -82,9 +82,11 @@
   </div>
 
   <script type="module">
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    // 1) Initialize Firebase App
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
+    // 2) Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
       authDomain: "forever-lockedin.firebaseapp.com",
@@ -94,40 +96,42 @@
       appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
     };
 
-    const app = initializeApp(firebaseConfig);
+    // 3) Initialize services
+    const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    document.getElementById("signoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "/index.html";
-      }).catch(error => {
-        alert("Error signing out: " + error.message);
-      });
+    // 4) Auth guard & populate user name
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        // not signed in → back to login
+        window.location.href = "index.html";
+      } else {
+        // show email as user name
+        const nameInput = document.querySelector('.setting-item input[type="text"]');
+        nameInput.value = user.email;
+      }
     });
 
+    // 5) Sign out handler
+    document.getElementById("signoutBtn").addEventListener("click", () => {
+      signOut(auth)
+        .then(() => window.location.href = "index.html")
+        .catch(error => alert("Error signing out: " + error.message));
+    });
+
+    // 6) Widget navigation (unchanged)
     const widget = document.getElementById('widget');
-
-widget.querySelectorAll('button').forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    switch(idx) {
-      case 0: // Profile
-        window.location.href = 'userprofile.html';
-        break;
-      case 1: // Settings
-        window.location.href = 'settings.html';
-        break;
-      case 2: // Menu
-        window.location.href = 'menu.html';
-        break;
-      case 3: // Messages
-        window.location.href = 'messages.html'; 
-        break;
-    }
-  });
-});
-
+    widget.querySelectorAll('button').forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        switch (idx) {
+          case 0: return window.location.href = 'userprofile.html';
+          case 1: return window.location.href = 'settings.html';
+          case 2: return window.location.href = 'menu.html';
+          case 3: return window.location.href = 'messages.html';
+        }
+      });
+    });
   </script>
-
 
 </body>
 </html>

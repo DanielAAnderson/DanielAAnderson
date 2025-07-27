@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css" />
- 
+
   <style>
     /* Basic widget styling */
     .widget {
@@ -32,7 +32,16 @@
     }
 
     /* Intro modal styles */
-    .intro-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
+    .intro-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
     .intro-content {
       background: #fff;
       border-radius: 8px;
@@ -78,10 +87,11 @@
   </style>
 </head>
 <body>
- <!-- Logo top right -->
+  <!-- Logo top right -->
   <a href="forever-home.html" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">
     <img src="lock.png" alt="Forever Logo" style="height: 40px; cursor: pointer;" />
   </a>
+
   <header>
     <h2>Welcome, <span id="user-email">Loading...</span></h2>
   </header>
@@ -102,18 +112,10 @@
 
   <!-- Floating Widget -->
   <div class="widget" id="widget">
-    <a href="userprofile.html" title="Profile">
-      <img src="padlock.png" alt="Profile" />
-    </a>
-    <a href="settings.html" title="Settings">
-      <img src="dial.png" alt="Settings" />
-    </a>
-    <a href="menu.html" title="Menu">
-      <img src="door-key.png" alt="Menu" />
-    </a>
-    <a href="messages.html" title="Messages">
-      <img src="key-hole.png" alt="Messages" />
-    </a>
+    <a href="userprofile.html" title="Profile"><img src="padlock.png" alt="Profile" /></a>
+    <a href="settings.html"   title="Settings"><img src="dial.png"    alt="Settings" /></a>
+    <a href="menu.html"       title="Menu"><img src="door-key.png" alt="Menu" /></a>
+    <a href="messages.html"   title="Messages"><img src="key-hole.png" alt="Messages" /></a>
   </div>
 
   <!-- Introductory Modal -->
@@ -147,11 +149,21 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
   <script type="module">
+    // 1) Firebase core
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+    // 2) Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
       authDomain: "forever-lockedin.firebaseapp.com",
@@ -161,70 +173,92 @@
       appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
     };
 
-    const app = initializeApp(firebaseConfig);
+    // 3) Initialize Firebase services
+    const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db   = getFirestore(app);
 
+    // 4) DOM refs
     const userEmailEl = document.getElementById('user-email');
-    const postsEl = document.getElementById('posts');
-    const postForm = document.getElementById('postForm');
-    const previewImg = document.getElementById('preview');
+    const postsEl     = document.getElementById('posts');
+    const postForm    = document.getElementById('postForm');
+    const postText    = document.getElementById('postText');
     const imageUpload = document.getElementById('imageUpload');
-    const widget = document.getElementById("widget");
+    const previewImg  = document.getElementById('preview');
+    const widget      = document.getElementById("widget");
 
     let imageDataURL = "";
 
+    // 5) Auth state – show email & intro modal, then subscribe to posts
     onAuthStateChanged(auth, user => {
       if (user) {
         userEmailEl.textContent = user.email;
-        // Show intro modal on first login
         document.getElementById('introModal').style.display = 'flex';
+
+        const postsQ = query(
+          collection(db, "posts"),
+          orderBy("createdAt", "desc")
+        );
+        onSnapshot(postsQ, snap => {
+          postsEl.innerHTML = "";
+          snap.forEach(doc => {
+            const p = doc.data();
+            const div = document.createElement("div");
+            div.className = "post";
+            div.innerHTML = `
+              <p>${p.text}</p>
+              ${p.imageURL ? `<img src="${p.imageURL}" style="max-width:100%;max-height:200px;">` : ""}
+            `;
+            postsEl.append(div);
+          });
+        });
       } else {
-        window.location.href = "forever-home.html"; // Redirect if not logged in
+        // redirect to login if not authenticated
+        window.location.href = "index.html";
       }
     });
 
+    // 6) Image preview logic
     imageUpload.addEventListener('change', () => {
       const file = imageUpload.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = e => {
-          imageDataURL = e.target.result;
-          previewImg.src = imageDataURL;
-          previewImg.style.display = "block";
+          imageDataURL            = e.target.result;
+          previewImg.src          = imageDataURL;
+          previewImg.style.display= "block";
         };
         reader.readAsDataURL(file);
       }
     });
 
-    postForm.addEventListener('submit', e => {
+    // 7) Post form – save to Firestore
+    postForm.addEventListener("submit", async e => {
       e.preventDefault();
-      const text = document.getElementById('postText').value.trim();
+      const text = postText.value.trim();
       if (!text) return alert("Post cannot be empty.");
-      const postDiv = document.createElement('div');
-      postDiv.className = "post";
-      postDiv.innerHTML = `
-        <p>${text}</p>
-        ${imageDataURL ? `<img src="${imageDataURL}" style="max-width:100%; max-height:200px;" />` : ""}
-      `;
-      postsEl.appendChild(postDiv);
+
+      await addDoc(collection(db, "posts"), {
+        authorUid: auth.currentUser.uid,
+        text,
+        imageURL: imageDataURL || "",
+        createdAt: serverTimestamp()
+      });
+
       postForm.reset();
       previewImg.style.display = "none";
       imageDataURL = "";
     });
 
-    // Drag logic
+    // 8) Draggable widget logic
     let isDragging = false, offsetX = 0, offsetY = 0;
-
-   widget.addEventListener("mousedown", e => {
-  isDragging = true;
-  offsetX = e.clientX - widget.offsetLeft;
-  offsetY = e.clientY - widget.offsetTop;
-
-  // ✨ Clear out the bottom/right anchors so left/top take effect ✨
-  widget.style.bottom = "auto";
-  widget.style.right  = "auto";
-});
-
+    widget.addEventListener("mousedown", e => {
+      isDragging = true;
+      offsetX = e.clientX - widget.offsetLeft;
+      offsetY = e.clientY - widget.offsetTop;
+      widget.style.bottom = "auto";
+      widget.style.right  = "auto";
+    });
     document.addEventListener("mousemove", e => {
       if (isDragging) {
         const newX = e.clientX - offsetX;
@@ -232,15 +266,14 @@
         const maxX = window.innerWidth - widget.offsetWidth;
         const maxY = window.innerHeight - widget.offsetHeight;
         widget.style.left = Math.min(Math.max(0, newX), maxX) + "px";
-        widget.style.top = Math.min(Math.max(0, newY), maxY) + "px";
+        widget.style.top  = Math.min(Math.max(0, newY), maxY) + "px";
       }
     });
-
     document.addEventListener("mouseup", () => {
       isDragging = false;
     });
 
-    // Intro modal logic
+    // 9) Intro modal controls
     const slides = document.querySelectorAll('.intro-slide');
     let currentSlide = 0;
     document.getElementById('nextSlide').addEventListener('click', () => {

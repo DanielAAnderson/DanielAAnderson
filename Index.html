@@ -129,20 +129,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          alert("Login successful!");
-          window.location.href = "forever-home.html";
-        })
-        .catch((error) => {
-          alert("Login error: " + error.message);
-        });
-    });
+   document.getElementById("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+  window.location.href = "forever-home.html";
+});
   </script>
 </body>
 </html>

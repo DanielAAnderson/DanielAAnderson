@@ -164,6 +164,17 @@ widget.querySelectorAll('button').forEach((btn, idx) => {
   });
 });
 
+onSnapshot(collection(db, "users"), snap => {
+  allUsers.innerHTML = snap.docs
+    .filter(d => d.id !== auth.currentUser.uid)
+    .map(d => `<option value="${d.id}">${d.data().email}</option>`)
+    .join("");
+});
+document.getElementById("viewProfileBtn").onclick = () => {
+  const uid = allUsers.value;
+  location.href = `userprofile.html?uid=${uid}`;
+};
+
   </script>
 
 </body>
