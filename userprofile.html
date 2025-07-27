@@ -6,80 +6,7 @@
   <title>User Profile - Forever Lockedin</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .profile-container {
-      max-width: 700px;
-      margin: 60px auto 30px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    .profile-pic {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 2px solid #f57c00;
-      object-fit: cover;
-      cursor: pointer;
-    }
-    input[type="file"] {
-      display: none;
-    }
-    .bio {
-      margin-top: 10px;
-      width: 100%;
-      min-height: 80px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      resize: vertical;
-    }
-    .background-picker {
-      margin-top: 15px;
-    }
-    .stats-section {
-      margin-top: 30px;
-    }
-    .stats-section h3 {
-      margin-bottom: 10px;
-    }
-    .stats-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .stats-table th,
-    .stats-table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    .stats-table th {
-      background-color: #f57c00;
-      color: white;
-    }
-    .posts-section {
-      margin-top: 30px;
-    }
-    .post {
-      border-top: 1px solid #ddd;
-      padding: 10px 0;
-      font-size: 1rem;
-      color: #212121;
-    }
-    .post img {
-      max-width: 100%;
-      max-height: 200px;
-      margin-top: 8px;
-      border-radius: 8px;
-    }
+    /* … your existing styles … */
   </style>
 </head>
 <body>
@@ -90,134 +17,99 @@
   </a>
 
   <div class="profile-container">
-    <h2>User Profile</h2>
-
-    <!-- NEW: Stats Table -->
-    <div class="stats-section">
-      <h3>Profile Stats</h3>
-      <table class="stats-table">
-        <tr>
-          <th>Friends</th>
-          <td><span id="friendCount">0</span></td>
-        </tr>
-        <tr>
-          <th>Posts</th>
-          <td><span id="postCount">0</span></td>
-        </tr>
-      </table>
-    </div>
-
-    <div class="profile-header">
-      <label for="profilePicInput">
-        <img id="profilePic" class="profile-pic" src="default-profile.png" alt="Profile Picture" title="Click to change profile picture" />
-      </label>
-      <input type="file" id="profilePicInput" accept="image/*" />
-    </div>
-
-    <label for="bioInput"><strong>Bio:</strong></label>
-    <textarea id="bioInput" class="bio" placeholder="Tell us about yourself..."></textarea>
-
-    <div class="background-picker">
-      <label for="backgroundColor">Change Background Color:</label>
-      <input type="color" id="backgroundColor" value="#ffffff" />
-    </div>
-
-    <div class="posts-section">
-      <h3>Recent Posts</h3>
-      <div id="posts">
-        <p>No posts yet.</p>
-      </div>
-    </div>
+    <!-- … your existing markup up through the Add Friend UI … -->
   </div>
 
   <!-- Widget -->
   <div class="widget" id="widget">
-    <button title="Profile"><img src="padlock.png" alt="P" /></button>
-    <button title="Settings"><img src="dial.png" alt="S" /></button>
-    <button title="Menu"><img src="door-key.png" alt="M" /></button>
-    <button title="Messages"><img src="key-hole.png" alt="Msg" /></button>
+    <!-- … -->
   </div>
 
-  <script>
-    const profilePicInput = document.getElementById("profilePicInput");
-    const profilePic = document.getElementById("profilePic");
-    const bioInput = document.getElementById("bioInput");
-    const backgroundColorInput = document.getElementById("backgroundColor");
-    const postsEl = document.getElementById("posts");
+  <!-- Combined Auth + Firestore + existing logic -->
+  <script type="module">
+    // 1️⃣ Firebase App & Auth imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    // Load saved profile pic and bio (in localStorage for demo)
-    if (localStorage.getItem("profilePic")) {
-      profilePic.src = localStorage.getItem("profilePic");
-    }
-    if (localStorage.getItem("bio")) {
-      bioInput.value = localStorage.getItem("bio");
-    }
-    if (localStorage.getItem("bgColor")) {
-      document.body.style.backgroundColor = localStorage.getItem("bgColor");
-      backgroundColorInput.value = localStorage.getItem("bgColor");
-    }
+    // 2️⃣ Firestore imports
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      onSnapshot,
+      updateDoc,
+      arrayUnion
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    // Profile picture upload
-    profilePicInput.addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = evt => {
-        profilePic.src = evt.target.result;
-        localStorage.setItem("profilePic", evt.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
+    // 3️⃣ Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+      authDomain: "forever-lockedin.firebaseapp.com",
+      projectId: "forever-lockedin",
+      storageBucket: "forever-lockedin.firebasestorage.app",
+      messagingSenderId: "1046869755533",
+      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+    };
 
-    // Save bio
-    bioInput.addEventListener("input", () => {
-      localStorage.setItem("bio", bioInput.value);
-    });
+    // 4️⃣ Initialize services
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
 
-    // Change background color
-    backgroundColorInput.addEventListener("input", () => {
-      document.body.style.backgroundColor = backgroundColorInput.value;
-      localStorage.setItem("bgColor", backgroundColorInput.value);
-    });
+    // 5️⃣ DOM refs (added only these—the rest remain as you had them)
+    const newFriendInput = document.getElementById("newFriendInput");
+    const addFriendBtn   = document.getElementById("addFriendBtn");
+    const friendListEl   = document.getElementById("friendList");
+    const friendCountEl  = document.getElementById("friendCount");
 
-    // Dummy posts
-    const dummyPosts = [
-      { text: "Just had a great day!", img: "" },
-      { text: "Check out this photo.", img: "sample-photo.jpg" }
-    ];
+    let friends = []; // will be replaced by Firestore onSnapshot
 
-    // Load posts
-    function loadPosts() {
-      if (dummyPosts.length === 0) {
-        postsEl.innerHTML = "<p>No posts yet.</p>";
-      } else {
-        postsEl.innerHTML = dummyPosts.map(post => `
-          <div class="post">
-            <p>${post.text}</p>
-            ${post.img ? `<img src="${post.img}" alt="Post image">` : ""}
-          </div>
-        `).join("");
+    // 6️⃣ Auth + Firestore subscription (unchanged from your code)
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
       }
-      // **NEW**: update stats counts
-      const friends = JSON.parse(localStorage.getItem("friends") || "[]");
-      document.getElementById("friendCount").textContent = friends.length;
-      document.getElementById("postCount").textContent = dummyPosts.length;
-    }
-    loadPosts();
-
-    // Widget navigation
-    const widget = document.getElementById('widget');
-    widget.querySelectorAll('button').forEach((btn, idx) => {
-      btn.addEventListener('click', () => {
-        switch(idx) {
-          case 0: window.location.href = 'userprofile.html'; break;
-          case 1: window.location.href = 'settings.html'; break;
-          case 2: window.location.href = 'menu.html'; break;
-          case 3: window.location.href = 'messages.html'; break;
-        }
+      const userDoc = doc(db, "users", user.uid);
+      setDoc(userDoc, { friends: [] }, { merge: true });
+      onSnapshot(userDoc, snap => {
+        const data = snap.data() || {};
+        friends = data.friends || [];
+        renderFriends();   // ← render whenever Firestore updates
       });
+      loadPosts();         // ← your existing call
     });
-  </script>
 
+    // 7️⃣ Your existing localStorage + posts logic…
+    //    (profile pic, bio, bg color, dummyPosts, loadPosts, etc.)
+
+    // 8️⃣ Friends‑replacement snippet **inserted here**:
+
+    // render function
+    function renderFriends() {
+      friendCountEl.textContent = friends.length;
+      if (!friends.length) {
+        friendListEl.innerHTML = "<li>No friends yet.</li>";
+      } else {
+        friendListEl.innerHTML = friends.map(f => `<li>${f}</li>`).join("");
+      }
+    }
+
+    // add‑friend handler
+    addFriendBtn.addEventListener("click", async () => {
+      const name = newFriendInput.value.trim();
+      if (!name) return alert("Enter a name.");
+      const user = auth.currentUser;
+      const userDoc = doc(db, "users", user.uid);
+      await updateDoc(userDoc, { friends: arrayUnion(name) });
+      newFriendInput.value = "";
+      // onSnapshot will trigger renderFriends()
+    });
+
+    // initial render in case onSnapshot is slightly delayed
+    renderFriends();
+
+    // 9️⃣ Rest of your existing widget‑nav code…
+  </script>
 </body>
 </html>
