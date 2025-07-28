@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find Friends – Forever Lockedin</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .search-container {
+      max-width: 500px;
+      margin: 60px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .search-container input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .results {
+      list-style: none;
+      padding: 0;
+    }
+    .results li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .results button {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .results button:disabled {
+      background: #aaa;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="search-container">
+    <h2>Find Friends</h2>
+    <input id="emailQuery" type="text" placeholder="Type an email to search…" />
+    <ul class="results" id="resultsList">
+      <!-- dynamically filled -->
+    </ul>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth }       from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      orderBy,
+      startAt,
+      endAt,
+      getDocs,
+      doc,
+      updateDoc,
+      arrayUnion
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // — your Firebase config —
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwvv1JiaE8Ja15pGc8Rf8j4s_5OPDLvsI",
+      authDomain: "forever-lockedin.firebaseapp.com",
+      projectId: "forever-lockedin",
+      storageBucket: "forever-lockedin.firebasestorage.app",
+      messagingSenderId: "1046869755533",
+      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+    };
+
+    // initialize
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    const emailQuery    = document.getElementById('emailQuery');
+    const resultsList   = document.getElementById('resultsList');
+
+    // helper: run a prefix search on email
+    async function searchByEmail(prefix) {
+      if (!prefix) {
+        resultsList.innerHTML = '';
+        return;
+      }
+      const q = query(
+        collection(db, 'users'),
+        orderBy('email'),
+        startAt(prefix),
+        endAt(prefix + '\uf8ff')
+      );
+      const snap = await getDocs(q);
+      resultsList.innerHTML = snap.docs
+        .map(docSnap => {
+          const { email } = docSnap.data();
+          const uid = docSnap.id;
+          return `
+            <li>
+              <span>${email}</span>
+              <button data-uid="${uid}">Add Friend</button>
+            </li>
+          `;
+        })
+        .join('');
+      // wire up the buttons
+      resultsList.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => addFriend(btn.dataset.uid, btn));
+      });
+    }
+
+    // add the selected uid to the current user’s friends
+    async function addFriend(friendUid, btn) {
+      const user = auth.currentUser;
+      if (!user) return alert('Please log in first.');
+      btn.disabled = true;
+      btn.textContent = 'Adding…';
+      const userDoc = doc(db, 'users', user.uid);
+      await updateDoc(userDoc, {
+        friends: arrayUnion(friendUid)
+      });
+      btn.textContent = 'Added';
+    }
+
+    // debounce user input by 300ms
+    let timer;
+    emailQuery.addEventListener('input', e => {
+      clearTimeout(timer);
+      timer = setTimeout(() => searchByEmail(e.target.value.trim()), 300);
+    });
+  </script>
+</body>
+</html>
