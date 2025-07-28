@@ -79,6 +79,14 @@
       color: #2e7d32;
       margin-bottom: 10px;
     }
+    .find-friends input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
     .find-friends select {
       width: 65%;
       padding: 8px;
@@ -137,6 +145,8 @@
     <!-- new: find-friends section -->
     <div class="find-friends">
       <h3>Find Friends</h3>
+      <!-- NEW: search box -->
+      <input type="text" id="searchUserInput" placeholder="Search by email…" />
       <select id="allUsers">
         <option>Loading users…</option>
       </select>
@@ -178,13 +188,17 @@
     const db   = getFirestore(app);
 
     // DOM refs
-    const menuBtn            = document.getElementById("menuBtn");
-    const dropdown           = document.getElementById("dropdownContent");
-    const externalSearchBtn  = document.getElementById("externalSearchBtn");
-    const externalSearchInput= document.getElementById("externalSearchInput");
-    const allUsers           = document.getElementById("allUsers");
-    const viewProfileBtn     = document.getElementById("viewProfileBtn");
-    const widget             = document.getElementById("widget");
+    const menuBtn             = document.getElementById("menuBtn");
+    const dropdown            = document.getElementById("dropdownContent");
+    const externalSearchBtn   = document.getElementById("externalSearchBtn");
+    const externalSearchInput = document.getElementById("externalSearchInput");
+    const searchUserInput     = document.getElementById("searchUserInput");
+    const allUsers            = document.getElementById("allUsers");
+    const viewProfileBtn      = document.getElementById("viewProfileBtn");
+    const widget              = document.getElementById("widget");
+
+    // store snapshot data for filtering
+    let allUsersData = [];
 
     // dropdown toggle
     menuBtn.addEventListener("click", () => {
@@ -208,18 +222,29 @@
         dropdown.style.display = 'none';
     };
 
-    // 4) Populate users dropdown from Firestore
+    // 4) Populate + filter users dropdown from Firestore
     onAuthStateChanged(auth, user => {
       if (!user) return window.location.href = "index.html";
       onSnapshot(collection(db, "users"), snap => {
-        allUsers.innerHTML = snap.docs
+        allUsersData = snap.docs
           .filter(d => d.id !== user.uid)
-          .map(d => {
-            const email = d.data().email || d.id;
-            return `<option value="${d.id}">${email}</option>`;
-          })
-          .join("") || `<option disabled>No other users</option>`;
+          .map(d => ({ uid: d.id, email: d.data().email || d.id }));
+        renderUserOptions(""); // initial render
       });
+    });
+
+    // helper to render <option> based on current filter
+    function renderUserOptions(filter) {
+      const f = filter.toLowerCase();
+      const matched = allUsersData.filter(u => u.email.toLowerCase().includes(f));
+      allUsers.innerHTML = matched.length
+        ? matched.map(u => `<option value="${u.uid}">${u.email}</option>`).join("")
+        : `<option disabled>No matches</option>`;
+    }
+
+    // wire up the live filter
+    searchUserInput.addEventListener("input", e => {
+      renderUserOptions(e.target.value);
     });
 
     // 5) View Profile button
