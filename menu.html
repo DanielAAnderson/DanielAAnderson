@@ -145,7 +145,6 @@
     <!-- new: find-friends section -->
     <div class="find-friends">
       <h3>Find Friends</h3>
-      <!-- NEW: search box -->
       <input type="text" id="searchUserInput" placeholder="Search by email…" />
       <select id="allUsers">
         <option>Loading users…</option>
@@ -179,7 +178,7 @@
       projectId: "forever-lockedin",
       storageBucket: "forever-lockedin.firebasestorage.app",
       messagingSenderId: "1046869755533",
-      appId: "1:1046869755533:web:a467a505735d25c0ee44c4"
+      appId: "1:1046869755533:web:a467c505235c0ee44c4"
     };
 
     // 3) Initialize
@@ -229,7 +228,7 @@
         allUsersData = snap.docs
           .filter(d => d.id !== user.uid)
           .map(d => ({ uid: d.id, email: d.data().email || d.id }));
-        renderUserOptions(""); // initial render
+        renderUserOptions(""); // initial render with no filter
       });
     });
 
