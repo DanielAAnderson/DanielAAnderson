@@ -1,0 +1,45 @@
+body {
+  font-family: sans-serif;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+header, footer {
+  background: #444;
+  color: #fff;
+  padding: 1rem;
+}
+.logo { max-height: 50px; }
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+nav li { margin-right: 1rem; }
+nav a { color: #fff; text-decoration: none; }
+
+main { padding: 1rem; }
+section { margin-bottom: 2rem; }
+
+/* Table styling */
+table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+th, td { border: 1px solid #aaa; padding: 0.5rem; text-align: left; }
+
+/* Form styling */nput, textarea, button {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+}
+button { background: #28a745; color: #fff; border: none; }
+
+/* Footer */
+footer { text-align: center; font-size: 0.9rem; }
+
+@media (max-width: 600px) {
+  nav ul { flex-direction: column; }
+  nav li { margin-bottom: 0.5rem; }
+}
