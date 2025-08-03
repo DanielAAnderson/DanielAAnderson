@@ -1,3 +1,4 @@
+<!-- about.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,24 +10,63 @@
 </head>
 <body>
   <header>
-    <img src="images/logo.png" alt="Smokin' Foods logo" class="logo">
-    <!-- same nav as index -->
+    <a href="index.html"><img src="images/logo.png" alt="Smokin' Foods logo" class="logo"></a>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="meats.html">Smoking Meats</a></li>
+        <li><a href="recipes.html">Recipes</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
   </header>
 
   <main>
     <h1>About Smokin' Foods</h1>
-    <img src="images/smoker.jpg" alt="Backyard smoker">
-    <p>Founded by barbecue enthusiasts, Smokin' Foods shares tips, tricks, and recipes to help you become a home pitmaster.</p>
-    <ul>
-      <li>Choosing the right wood</li>
-      <li>Mastering the smoke ring</li>
-      <li>Temperature control</li>
-    </ul>
+
+    <section>
+      <img src="images/smoker.jpg" alt="Backyard smoker" class="about-img">
+      <p><strong>Smokin' Foods</strong> was founded by a small crew of backyard barbecue lovers who believed great smoked meat should be accessible to everyone—not just the pros. We started sharing tips and techniques online and quickly grew into a community of passionate pitmasters.</p>
+    </section>
+
+    <section>
+      <h2>What We Teach</h2>
+      <ul>
+        <li>Choosing the right wood for your meat</li>
+        <li>Mastering the perfect smoke ring</li>
+        <li>Controlling temperature for consistent results</li>
+        <li>Knowing when to wrap and when to rest</li>
+        <li>How different smokers impact flavor</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Types of Smokers</h2>
+      <div class="smoker-types">
+        <article>
+          <img src="images/offset-smoker.png" alt="Offset smoker">
+          <h3>Offset</h3>
+          <p>Classic wood-burning smoker with strong smoky flavor, great for large cuts.</p>
+        </article>
+        <article>
+          <img src="images/pellet-smoker.png" alt="Pellet smoker">
+          <h3>Pellet</h3>
+          <p>Electric-powered and user-friendly, uses wood pellets for clean, even smoke.</p>
+        </article>
+        <article>
+          <img src="images/electric-smoker.png" alt="Electric smoker">
+          <h3>Electric</h3>
+          <p>Ideal for beginners. Plug in, set the temp, and let it go. Minimal oversight needed.</p>
+        </article>
+      </div>
+    </section>
   </main>
 
   <footer>
-    <!-- same footer -->
+    <p>&copy; 2025 Smokin' Foods</p>
   </footer>
+
   <script src="js/form.js"></script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+<!-- contact.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
 </head>
 <body>
   <header>
-    <img src="images/logo.png" alt="Smokin' Foods logo" class="logo">
+    <a href="index.html"><img src="images/logo.png" alt="Smokin' Foods logo" class="logo"></a>
     <nav>
       <ul>
         <li><a href="index.html">Home</a></li>
@@ -23,20 +24,34 @@
 
   <main>
     <h1>Contact Us</h1>
-    <form id="contactForm">
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required maxlength="50">
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
+    <section class="contact-info">
+      <p>If you have any questions, want to share a recipe, or need help troubleshooting your smoker, we’d love to hear from you!</p>
+      <ul>
+        <li><strong>Email:</strong> support@smokinfoods.com</li>
+        <li><strong>Phone:</strong> (555) 123-4567</li>
+        <li><strong>Location:</strong> 123 Smoke Lane, Kansas City, MO</li>
+        <li><strong>Follow us:</strong> 
+          <a href="#">Instagram</a> | <a href="#">Facebook</a> | <a href="#">YouTube</a>
+        </li>
+      </ul>
+    </section>
 
-      <label for="message">Message:</label>
-      <textarea id="message" name="message" rows="5" cols="40" required></textarea>
+    <section class="contact-form">
+      <form id="contactForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required maxlength="50">
 
-      <button type="submit">Send</button>
-    </form>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
 
-    <p id="formFeedback"></p>
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="5" cols="40" required></textarea>
+
+        <button type="submit">Send</button>
+      </form>
+      <p id="formFeedback"></p>
+    </section>
   </main>
 
   <footer>

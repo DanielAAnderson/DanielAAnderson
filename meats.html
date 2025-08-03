@@ -1,3 +1,4 @@
+<!-- meats.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,26 +9,72 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header><!-- same --></header>
+  <header>
+    <a href="index.html"><img src="images/logo.png" alt="Smokin' Foods logo" class="logo"></a>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="meats.html">Smoking Meats</a></li>
+        <li><a href="recipes.html">Recipes</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
   <main>
     <h1>Smoking Meats 101</h1>
 
-    <figure>
-      <img src="images/brisket.jpg" alt="Sliced smoked brisket">
-      <figcaption>Brisket: low & slow at 225°F for 10–12 hours</figcaption>
-    </figure>
+    <section class="meat-section">
+      <article>
+        <figure>
+          <img src="images/brisket.jpg" alt="Sliced smoked brisket">
+          <figcaption>Brisket: low & slow at 225°F for 10–12 hours</figcaption>
+        </figure>
+        <p>Beef brisket is a true test of patience. Smoking it low and slow helps break down the connective tissue for a juicy, tender result. Wrap in butcher paper around hour 6 to retain moisture.</p>
+      </article>
 
-    <figure>
-      <img src="images/ribs.jpg" alt="Smoked ribs">
-      <figcaption>Pork Ribs: baby backs or spares, 225°F for 5–6 hours</figcaption>
-    </figure>
+      <article>
+        <figure>
+          <img src="images/ribs.jpg" alt="Smoked ribs">
+          <figcaption>Pork Ribs: baby backs or spares, 225°F for 5–6 hours</figcaption>
+        </figure>
+        <p>Pork ribs benefit from the 3-2-1 method: 3 hours unwrapped, 2 hours wrapped in foil, and 1 hour with sauce uncovered. This builds flavor and keeps them tender without drying out.</p>
+      </article>
 
-    <figure>
-      <img src="images/smoker.jpg" alt="Charcoal smoker">
-      <figcaption>Choosing your smoker: offset, bullet, electric, or pellet</figcaption>
-    </figure>
+      <article>
+        <figure>
+          <img src="images/chicken.jpg" alt="Smoked chicken">
+          <figcaption>Chicken: 250°F for about 3 hours</figcaption>
+        </figure>
+        <p>Whole smoked chicken is flavorful and cooks relatively quickly. Use apple or cherry wood for a sweet smoke flavor and finish with a crisp skin by increasing temp near the end.</p>
+      </article>
+
+      <article>
+        <figure>
+          <img src="images/salmon.jpg" alt="Smoked salmon">
+          <figcaption>Salmon: 200°F for 2 hours</figcaption>
+        </figure>
+        <p>Salmon takes on smoke beautifully and cooks quickly. Brine beforehand, then pat dry to develop a good pellicle for better smoke absorption.</p>
+      </article>
+    </section>
+
+    <section>
+      <h2>Pro Tips for Smoking Meat</h2>
+      <ul>
+        <li>Let your meat rest after smoking to retain juices.</li>
+        <li>Use a digital thermometer to monitor internal temp.</li>
+        <li>Soak wood chips if using charcoal or gas smokers.</li>
+        <li>Don’t peek too often—every time you open the lid, heat escapes.</li>
+        <li>Experiment with wood combinations like hickory + cherry for unique flavors.</li>
+      </ul>
+    </section>
   </main>
-  <footer><!-- same --></footer>
+
+  <footer>
+    <p>&copy; 2025 Smokin' Foods</p>
+  </footer>
+
   <script src="js/form.js"></script>
 </body>
 </html>

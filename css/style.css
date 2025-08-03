@@ -9,12 +9,13 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   line-height: 1.5;
   color: #333;
+  background-color: #f9f9f9;
 }
 
-/* Header and footer fixed at top and bottom */
+/* Header and footer */
 header,
 footer {
   background: #222;
@@ -23,7 +24,7 @@ footer {
   flex: none;
 }
 
-/* Logo link in top right back to home */
+/* Logo link in top right */
 header .logo {
   max-height: 50px;
   float: right;
@@ -35,6 +36,7 @@ nav ul {
   margin: 0;
   padding: 0;
   display: flex;
+  flex-wrap: wrap;
 }
 nav li {
   margin-right: 1rem;
@@ -42,23 +44,27 @@ nav li {
 nav a {
   color: #fff;
   text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+nav a:hover {
+  color: #ff6600;
 }
 
-/* Main content expands to fill available space */
+/* Main content */
 main {
   flex: 1;
-  overflow: auto;
   padding: 1rem;
 }
 section {
   margin-bottom: 2rem;
 }
 
-/* Table styling */
+/* Table */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
+  background: #fff;
 }
 th,
 td {
@@ -66,35 +72,78 @@ td {
   padding: 0.5rem;
   text-align: left;
 }
+th {
+  background-color: #eee;
+}
 
-/* Form inputs styling */
+/* Form */
 input,
 textarea,
 button {
   display: block;
   width: 100%;
   max-width: 400px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 button {
   background: #333;
   color: #fff;
   border: none;
+  cursor: pointer;
+}
+button:hover {
+  background: #ff6600;
 }
 
-/* Footer center text */
+/* Footer */
 footer {
   text-align: center;
   font-size: 0.9rem;
 }
 
-/* Responsive adjustments */
+/* Gallery & smoker types */
+.gallery {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.gallery img {
+  width: 100%;
+  max-width: 200px;
+  border-radius: 8px;
+}
+
+.smoker-types {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.smoker-types article {
+  flex: 1 1 250px;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+.smoker-types img {
+  width: 100%;
+  max-width: 150px;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
   nav ul {
     flex-direction: column;
   }
   nav li {
     margin-bottom: 0.5rem;
+  }
+
+  .gallery,
+  .smoker-types {
+    flex-direction: column;
   }
 }
